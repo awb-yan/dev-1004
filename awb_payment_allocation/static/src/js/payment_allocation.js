@@ -178,39 +178,41 @@ var _t = core._t;
 					// return a.localeCompare(b); // <-- alternative 
 					});
 				var mv_line_id = date_sort[0].id;
-				console.log("TESTEST", date_sort[0].name, payment_id)
+				// console.log("TESTEST", date_sort[0].name, payment_id)
 				var account_move_line_id = self.get_payment_allocation_account_move_id(payment_id);
 				var account_move_line = Promise.all([account_move_line_id]).then((amresults) =>{
 					var am_id = amresults[0];
 					// var find_id = date_sort.find(date_sort[0].id == am_id);
-					console.log("PAYMENT ID", mv_line_id, am_id)
-					// for (var x = 0; x < recs_count; x++) {
-					if (date_sort[0].amount > 0 && date_sort[0].id === am_id){
-						console.log("DATE SORT", date_sort.length)
-						this.trigger_up('add_proposition', {'data': mv_line_id});
-					}else if (date_sort[0].amount < 0){
-						console.log("TEST OLD INVOICE FIRST", date_sort)
-						this.trigger_up('add_proposition', {'data': mv_line_id});
-					}else {
-						console.log("ELSE STATEMENT")
-						// this.trigger_up('add_proposition', {'data': mv_line_id});
-						// continue;
+					// console.log("PAYMENT ID", mv_line_id, am_id)
+					for (var x = 0; x < recs_count; x++) {
+						if (date_sort[0].amount > 0){
+							// console.log("DATE SORT", date_sort.length)
+							this.trigger_up('add_proposition', {'data': mv_line_id});
+							break;
+						}else if (date_sort[0].amount < 0){
+							// console.log("TEST OLD INVOICE FIRST", date_sort)
+							this.trigger_up('add_proposition', {'data': mv_line_id});
+							break;
+						}else {
+							// console.log("ELSE STATEMENT")
+							// this.trigger_up('add_proposition', {'data': mv_line_id});
+							continue;
+						}
 					}
-					// }
-					console.log("ACCOUNT MOVE", account_move_line, am_id)
+					// console.log("ACCOUNT MOVE", account_move_line, am_id)
 				});
 
 			// High Amount first
 			}else if (pr == 'high_amount' && stateMvLines.length != 0){
 				var high_amount_sort_debit = stateMvLines.slice().sort((a, b) => b.debit - a.debit);
 				var high_amount_sort_credit = stateMvLines.slice().sort((a, b) => b.credit - a.credit);
-				console.log("TEST HIGH AMOUNT FIRST", high_amount_sort_debit)
+				// console.log("TEST HIGH AMOUNT FIRST", high_amount_sort_debit)
 				if (high_amount_sort_debit[i].credit <= 0) {
-					console.log("PAYMENT")
+					// console.log("PAYMENT")
 					var mv_line_id2 = high_amount_sort_debit[i].id;
 					this.trigger_up('add_proposition', {'data': mv_line_id2});
 				} else if (high_amount_sort_credit[i].debit <= 0) {
-					console.log("INVOICE")
+					// console.log("INVOICE")
 					var mv_line_id3 = high_amount_sort_credit[i].id;
 					this.trigger_up('add_proposition', {'data': mv_line_id3});
 				}
@@ -218,13 +220,13 @@ var _t = core._t;
 			}else if (pr == 'low_amount' && stateMvLines.length != 0) {
 				var low_amount_sort_debit = stateMvLines.slice().sort((a, b) => a.debit - b.debit);
 				var low_amount_sort_credit = stateMvLines.slice().sort((a, b) => a.credit - b.credit);
-				console.log("TEST LOW AMOUNT FIRST", low_amount_sort_debit)
+				// console.log("TEST LOW AMOUNT FIRST", low_amount_sort_debit)
 				if (low_amount_sort_debit[i].amount < 0) {
-					console.log("INVOICE")
+					// console.log("INVOICE")
 					var mv_line_id4 = low_amount_sort_debit[i].id;
 					this.trigger_up('add_proposition', {'data': mv_line_id4});
 				} else if (low_amount_sort_credit[i].amount > 0) {
-					console.log("PAYMENT")
+					// console.log("PAYMENT")
 					var mv_line_id5 = low_amount_sort_credit[i].id;
 					this.trigger_up('add_proposition', {'data': mv_line_id5});
 				}
@@ -233,26 +235,29 @@ var _t = core._t;
 				var invoice_lines = self.get_payment_allocation_invoice_lines(payment_id);
 				var invoice_lines_ids = Promise.all([invoice_lines]).then((ilidresults) =>{
 					var il_id = ilidresults[0];
-					console.log("MANUAL1111", il_id)
+					// console.log("MANUAL1111", il_id)
 					var payment_invoice = self.get_payment_allocation_invoice_ids(il_id);
 					var pa_invoice = Promise.all([payment_invoice]).then((paidresults) =>{
 						var pail_id = paidresults[0];
-						console.log("MANUAL2222", pail_id)
+						// console.log("MANUAL2222", pail_id)
 						var account_move_line = self.get_invoices_account_move_lines(pail_id);
 						var aml = Promise.all([account_move_line]).then((amlidresults) =>{
 							var aml_id = amlidresults[0];
 							console.log("MANUAL3333", aml_id)
 							// for (let x = 0; x < recs_count; x++) {
-							console.log("MANUAL4444", stateMvLines[0].id)
+							// console.log("MANUAL4444", stateMvLines[0].id)
+							var manual_sort = aml_id.slice().sort((a, b) => a.index - b.index);
 							if (stateMvLines[0].amount < 0){
-								for (let i = 0; i < aml_id.length; i++) {
-									if (stateMvLines[0].id == aml_id[i]){
-										console.log("INVOICE", aml_id[i], stateMvLines[0].amount)
-										this.trigger_up('add_proposition', {'data': aml_id[i]});
+								for (let i = 0; i < manual_sort.length; i++) {
+									if (manual_sort[i].id){
+										console.log("MANUAL4444", manual_sort[i].id)
+										console.log("MANUAL4444222", stateMvLines[0].id)
+										// console.log("INVOICE", aml_id[i], stateMvLines[0].amount)
+										this.trigger_up('add_proposition', {'data': manual_sort[i].id});
 									}
 								}
 							}else if (stateMvLines[0].amount > 0) {
-								console.log("PAYMENT", stateMvLines[0].amount)
+								// console.log("PAYMENT", stateMvLines[0].amount)
 								this.trigger_up('add_proposition', {'data': stateMvLines[0].id});
 							}
 							// }
@@ -342,7 +347,7 @@ var _t = core._t;
 				args: [domain, fields],
 			}).then(function(data){
 				for(var i in data){
-					console.log("ALLOCATION MODE FUNCTION")
+					// console.log("ALLOCATION MODE FUNCTION")
 					if(data[i].id == payment_id){
 						allocation_mode = data[i].allocation_mode;
 						// break;
@@ -367,7 +372,7 @@ var _t = core._t;
 				for(var i in data){
 					// console.log("ACCOUNT MOVE LINE FUNCTION 1111", data[i].payment_id, data[i].credit)
 					if(data[i].payment_id[0] == payment_id && data[i].credit > 0){
-						console.log("ACCOUNT MOVE LINE FUNCTION 2222", data[i].payment_id[0], data[i].credit, data[i].id)
+						// console.log("ACCOUNT MOVE LINE FUNCTION 2222", data[i].payment_id[0], data[i].credit, data[i].id)
 						account_move_line_id = data[i].id;
 						// break;
 					};
@@ -414,7 +419,7 @@ var _t = core._t;
 					// console.log("PAL", data[i].id)
 					for (let y = 0; y < il_id.length; y++) {
 						if(data[i].id === il_id[y]){
-							console.log("PAL222", invoice_line_id)
+							// console.log("PAL222", invoice_line_id)
 							invoice_line_id.push(data[i].invoice[0]);
 							// break;
 					};
@@ -439,8 +444,8 @@ var _t = core._t;
 				for(var i in data){
 					for (let z = 0; z < pail_id.length; z++){
 						if(data[i].move_id[0] === pail_id[z] && data[i].debit > 0){
-							console.log("PAIL ID2222", account_move_line_id, z, pail_id[z], data[i].move_id[0])
-							account_move_line_id.push(data[i].id);
+							// console.log("PAIL ID2222", account_move_line_id, z, pail_id[z], data[i].move_id[0])
+							account_move_line_id.push({id: data[i].id, index: z});
 							// break;
 						}
 					};

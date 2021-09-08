@@ -46,5 +46,25 @@ Hi ${partner_id}. Your account number – ${customer_number}; has an outstanding
 Hi ${partner_id} ${customer_number}. We've temporarily disconnected your account due to non-payment. Kindly settle your balance amounting to ${total_statement_balance} immediately via online or in any of our accredited payment centers to restore your service. Thank you!            
             </field>
         </record>
+
+        <record id="sms_template_subs_welcome" model="awb.sms.template">
+            <field name="name">Subscription Welcome Notification</field>
+            <field name="template_body">
+Hi ${partner_id}.
+Welcome to Streamtech, thank you for availing ${product_names} with ${product_desc}.
+You will receive another notice in [1-2] hours once your subscription has been activated.
+For any concerns, you may contact [Customer Portal, Customer Service]
+            </field>
+        </record>
+
+        <record id="sms_template_subs_activation" model="awb.sms.template">
+            <field name="name">Subscription Activation Notification</field>
+            <field name="template_body">
+Hi ${partner_id}.
+Your account has been successfully activated. You may now enjoy unlimited access to ${product_desc}.
+For any inquiries and concerns, please contact us at [Link to Customer Portal, Customer Service]
+            </field>
+        </record>
+
     </data>
 </odoo>

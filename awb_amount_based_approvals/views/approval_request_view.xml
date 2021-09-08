@@ -8,16 +8,25 @@
                 <field name="department_id" 
                        groups="approvals.group_approval_user" 
                        required="1" 
-                       attrs="{'readonly':[('request_status','!=','new')]}"
+                       attrs="{'readonly':[('request_status','!=','new')],'required':[('has_department','==','required')],'invisible':[('has_department','!=','required')]}"
                        domain="[('company_id', '=', company_id)]" 
                        force_save="1"/>
                 <field name="manager_id" 
                        groups="approvals.group_approval_user" 
                        required="1" 
-                       attrs="{'readonly':[('request_status','!=','new')]}"
+                       attrs="{'readonly':[('request_status','!=','new')],'required':[('has_manager','==','required')],'invisible':[('has_manager','!=','required')]}"
                        domain="[('company_id', '=', company_id)]" 
                        force_save="1"/>
+                <field name="has_department" invisible="1"/>
+                <field name="has_manager" invisible="1"/>
+                <field name="can_approve" invisible="1"/>
+                <field name="user_status" invisible="1"/>
             </xpath>
+
+            <xpath expr="//button[@name='action_approve']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|','|',('user_status','!=','pending'),('can_approve','=', False)]}</attribute>
+            </xpath>
+
             <xpath expr="//page[@name='approvers']/field[@name='approver_ids']/tree/field[@name='user_id']" position="before">
                 <field name="sequence" string="Sequence"/>
             </xpath>

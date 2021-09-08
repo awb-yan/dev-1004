@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_view_inherit" model="ir.ui.view">
+        <field name="name">product.view.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_information']//group" position="after">
+                <group>
+                    <group string="Salesforce">
+                        <field name="salesforce_id" string="Id"/>
+                        <field name="sf_plan_type"/>
+                        <field name="sf_facility_type"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="facility_type_form" model="ir.ui.view">
+        <field name="name">product.facility.type.form</field>
+        <field name="model">product.facility.type</field>
+        <field name="arch" type="xml">
+          <form string="Facility Type">
+            <sheet>
+                <group col="4">
+                    <field name="name" modifiers="{&quot;required&quot;: true}"/>
+                    <field name="description" colspan="4"/>
+                    <field name="is_aradial_product" string="Aradial Product"/>
+                </group>
+            </sheet>
+          </form>
+        </field>
+    </record>
+
+    <record id="facility_type_tree" model="ir.ui.view">
+        <field name="name">product.facility.type.tree</field>
+        <field name="model">product.facility.type</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Facility Type" >
+                <field name="name" string="Name"/>
+                <field name="description"/>
+                <field name="is_aradial_product" string="Aradial Product"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_facility_type" model="ir.actions.act_window">
+        <field name="name">Facility Type</field>
+        <field name="res_model">product.facility.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="facility_type_tree"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a Facility Type
+          </p><p>
+            Create Product Facility Type.
+          </p>
+        </field>
+    </record>
+    
+    <record id="plan_type_form" model="ir.ui.view">
+        <field name="name">product.plan.type.form</field>
+        <field name="model">product.plan.type</field>
+        <field name="arch" type="xml">
+          <form string="Plan Type">
+            <sheet>
+                <group col="4">
+                    <field name="name" modifiers="{&quot;required&quot;: true}"/>
+                    <field name="description" colspan="4"/>
+                </group>
+            </sheet>
+          </form>
+        </field>
+    </record>
+
+    <record id="plan_type_tree" model="ir.ui.view">
+        <field name="name">product.plan.type.tree</field>
+        <field name="model">product.plan.type</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Plan Type" >
+                <field name="name" string="Name"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_plan_type" model="ir.actions.act_window">
+        <field name="name">Plan Type</field>
+        <field name="res_model">product.plan.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="plan_type_tree"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a Plan Type
+          </p><p>
+            Create Product Plan Type.
+          </p>
+        </field>
+    </record>
+
+    <menuitem
+        name="Facility Type"
+        action="action_facility_type"
+        id="menu_facility_type_product_inventory"
+        parent="stock.menu_product_in_config_stock" 
+        groups="sales_team.group_sale_manager"
+        sequence="40"/>
+
+    <menuitem
+        name="Facility Type"
+        action="action_facility_type"
+        id="menu_facility_type_product_sale"
+        parent="sale.prod_config_main" 
+        groups="sales_team.group_sale_manager"
+        sequence="40"/>
+
+    <menuitem
+        name="Plan Type"
+        action="action_plan_type"
+        id="menu_plan_type_product_inventory"
+        parent="stock.menu_product_in_config_stock" 
+        groups="sales_team.group_sale_manager"
+        sequence="50"/>
+
+    <menuitem
+        name="Plan Type"
+        action="action_plan_type"
+        id="menu_plan_type_product_sale"
+        parent="sale.prod_config_main" 
+        groups="sales_team.group_sale_manager"
+        sequence="50"/>
+    
+</odoo>

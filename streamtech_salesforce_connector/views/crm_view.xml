@@ -11,6 +11,9 @@
             <group string="Salesforce">
               <field name="salesforce_id"/>
               <field name="opportunity_number"/>
+              <label for="jo_sms_id" string="Job Order SMS ID: "/>
+                <field name="jo_sms_id_username" readonly="1"></field>
+                <field name="jo_sms_id_password" invisible="1"></field>
             </group>
           </group>
         </xpath>

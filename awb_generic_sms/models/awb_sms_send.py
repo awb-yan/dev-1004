@@ -402,3 +402,12 @@ class SMS(models.Model):
                 state=state,
                 send_type=send_type,
             )
+
+    def _send_subscription_notif(self, recordset, template_name, state):
+        self.send_now(
+            recordset=recordset,
+            template_name=template_name,
+            state=state,
+        )
+        _logger.info("----- %s -----" % template_name)
+        _logger.info("----- SMS Sending Done -----")

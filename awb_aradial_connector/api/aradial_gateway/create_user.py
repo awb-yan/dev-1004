@@ -39,6 +39,8 @@ class AradialAPIGateway(object):
         except requests.exceptions.MissingSchema as e:
             raise exceptions.ValidationError(e)
 
+        _logger.info(res.json())
+        
         state = "Success" if res.status_code == 201 else "Fail"
         _logger.info("response [%s]" % res)
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record model="res.users" id="aradial_user">
+        <field name="name">Aradial User</field>
+        <field name="login">aradial_user</field>
+        <field name="password">P@$$w0rd</field>
+    </record>
+</odoo>

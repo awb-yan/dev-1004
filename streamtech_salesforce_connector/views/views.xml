@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="my_record_01" model="salesforce.connector">
+            <field name="field_name">Salesforce</field>
+        </record>
+    </data>
+    <data>
+        <record model="ir.ui.view" id="salesforce_setting_inherit">
+            <field name="name">res.config.settings.salesforce.setting.inherit</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="salesforce_connector.salesforce_setting"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@data-key='salesforce_connector']/div[@id='salesforce_Settings']/div[@class='row mt16 o_settings_container']/div[@class='col-12 col-lg-6 o_setting_box'][2]/div[@class='o_setting_right_pane']/div[@class='text-muted']" position="after">
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="sf_sandbox"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="sf_sandbox" class="o_light_label"/>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

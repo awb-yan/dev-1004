@@ -11,12 +11,17 @@
                        widget="many2many_tags" 
                        options="{'no_create_edit': True}" />
             </xpath>
-            <xpath expr="//group[@name='approvers']/field[@name='user_ids']" position="attributes">
+            <xpath expr="//field[@name='has_location']" position="after">
+                <field name="has_department" string="Department" widget="radio" options="{'horizontal': true}"/>                
+                <field name="has_manager" string="Manager" widget="radio" options="{'horizontal': true}"/>                
+            </xpath>
+
+            <!-- <xpath expr="//group[@name='approvers']/field[@name='user_ids']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//group[@name='approvers']/field[@name='approval_minimum']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
 </odoo>

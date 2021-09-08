@@ -15,7 +15,7 @@ class ApprovalRule(models.Model):
     max_amount = fields.Float('Maximum Amount', required=True, tracking=True)
     active = fields.Boolean('Active', index=True, default=True, tracking=True)
     approval_type = fields.Selection([('amount', 'Amount'),('none','None')], string='Approval Type', default='amount', tracking=True)
-    department = fields.Many2one('hr.department', String='Department', domain="[('company_id', '=', company_id)]")
+    department = fields.Many2one('hr.department', String='Department')
 
     manager_id = fields.Boolean('Manager', default=False, tracking=True)
     operation_head_id = fields.Boolean('Operations Head', default=False, tracking=True)
@@ -23,7 +23,7 @@ class ApprovalRule(models.Model):
     approver_ids = fields.One2many('approval.rule.line','approval_id', String='Approvers')
     company_id = fields.Many2one('res.company', 'Company', index=True, default=lambda self: self.env.company)
 
-    @api.depends('min_amount', 'max_amount')
+    @api.depends('min_amount', 'max_amount', 'department')
     def _compute_name(self):
         for rule in self:
             category_name = rule.category.name if rule.category.name else ''
@@ -32,10 +32,18 @@ class ApprovalRule(models.Model):
             rule.name = f'{department_name}: {category_name} Amount: {currency_name} {rule.min_amount} - {rule.max_amount}'
 
     @api.constrains('min_amount', 'max_amount')
-    def _check_negative_amount(self):
+    def _check_amount(self):
         for record in self:
-            if record.min_amount < 0 or record.max_amount <0:
+            if record.min_amount < 0 or record.max_amount < 0:
                 raise UserError(_('Amount must be greater than 0'))
+            elif record.min_amount >= record.max_amount:
+                raise UserError(_('Maximum Amount must be greater than Minimum Amount'))
+
+    @api.constrains('manager_id', 'operation_head_id')
+    def _check_manager_head_checkbox(self):
+        for record in self:
+            if not record.manager_id and not record.operation_head_id:
+                raise UserError(_('Manager or the Operations Head must be checked. '))
 
 class ApprovalRuleLine(models.Model):
     _name = "approval.rule.line"

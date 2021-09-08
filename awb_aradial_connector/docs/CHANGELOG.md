@@ -1,8 +1,6 @@
 # Changelog
 
 
-## [13.0.1.0.1] - 2021-07-23
+## [13.0.1.0.0] - 2021-09-08
 
-- [IMP] Welcome Text Message for new subscribers
-- [IMP] Generate password for new aradial users
-- [IMP] Set new subscribers to Draft
+- [IMP] Create user in Aradial
