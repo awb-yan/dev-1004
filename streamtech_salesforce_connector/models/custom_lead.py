@@ -15,3 +15,5 @@ class CustomLead(models.Model):
                                 ("Pre-Termination", "Pre-Termination"),
                                 ("Transfer", "Transfer")
                                 ], string='Type')
+    jo_sms_id_username = fields.Char('Username')
+    jo_sms_id_password = fields.Char('Password')

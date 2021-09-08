@@ -1,3 +1,4 @@
+from ..helpers.salesforce_connector import SalesForceConnect
 import logging
 import datetime
 
@@ -73,6 +74,26 @@ class SalesForceImporterProducts(models.Model):
             else:
                 bandwidth = '0'
 
+            plan_type = product.get('Plan_Type__c')
+            if plan_type:
+                product_plan_type = self.env['product.plan.type'].search([('name', '=', plan_type)], limit=1)
+                if not product_plan_type:
+                    product_plan_type = self.env['product.plan.type'].create({'name': plan_type, 'description': plan_type})
+                
+                prod_plan_type = product_plan_type.id
+            else: 
+                prod_plan_type = None
+            
+            facility_type = product.get('Facility_Type__c')
+            if facility_type:
+                product_facility_type = self.env['product.facility.type'].search([('name', '=', facility_type)], limit=1)
+                if not product_facility_type:
+                    product_facility_type = self.env['product.facility.type'].create({'name': facility_type, 'description': facility_type})
+                
+                prod_facility_type = product_facility_type.id
+            else: 
+                prod_facility_type = None
+
             data = {
                 'salesforce_id': product['Id'],
                 'name': product['Name'],
@@ -84,7 +105,9 @@ class SalesForceImporterProducts(models.Model):
                 'categ_id': category.id,
                 'device_fee': product.get('Device_Fee__c', 0),
                 'type': 'service',
-                'active': product.get('IsActive', True)
+                'active': product.get('IsActive', True),
+                'sf_plan_type': prod_plan_type,
+                'sf_facility_type': prod_facility_type
             }
 
             if not odoo_product:
@@ -117,11 +140,15 @@ class SalesForceImporterProducts(models.Model):
                 ", Family, IsActive, Type__c, Facility_Type__c, Bandwidth__c" \
                 ", Monthly_Subscription_Fee__c " \
                 ", CreatedDate, LastModifiedDate " \
+                ", Plan_Type__c " \
                 " FROM Product2 " \
                 " WHERE IsActive = True"
 
-        if not self.sales_force:
-            self.connect_to_salesforce()
+        sf = SalesForceConnect()
+        self.sales_force = sf.connect_salesforce(self)
+
+        # if not self.sales_force:
+        #     self.connect_to_salesforce()
 
         if id:
             query += " AND Id ='" + id + "'"

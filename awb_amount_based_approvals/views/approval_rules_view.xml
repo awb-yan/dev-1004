@@ -28,7 +28,7 @@
                             <field name="approval_type" string="Type" widget="radio" options="{'horizontal': true}"/>
                             <field name="manager_id" />
                             <field name="operation_head_id" />
-                            <field name="department" />
+                            <field name="department" domain="[('company_id', '=', company_id)]" />
                             <field name="active" invisible="1" />
                         </group>
                         <group>
@@ -44,7 +44,9 @@
                             <tree editable="bottom">
                                 <field name="sequence"/>
                                 <field name="approval_condition" required="1"/>
-                                <field name="approved_by" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                                <field name="approved_by" 
+                                       widget="many2many_tags" 
+                                       options="{'no_create_edit': True}"/>
                             </tree>
                         </field>                        
                     </group>

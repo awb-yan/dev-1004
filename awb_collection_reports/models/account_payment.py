@@ -31,16 +31,17 @@ class AccountPayment(models.Model):
             if not record.invoice_line:
                 for invoice in record.reconciled_invoice_ids:
                     due_date = invoice.invoice_date_due
-                    line_total = 0
+                    # line_total = 0
                     if due_date:
                         if due_date >= record.payment_date:
                             # for payment in invoice.payment_ids.filtered(lambda x: x.id == record.id):
-                            for lines in invoice.invoice_line_ids:
-                                line_total += lines.price_subtotal
-                                if line_total <= record.amount:
-                                    amount = line_total
-                                elif line_total > record.amount:
-                                    amount = record.amount
+                            # for lines in invoice.invoice_line_ids:
+                                # line_total += lines.price_subtotal
+                            if invoice.amount_total <= record.amount:
+                                # amount = line_total
+                                amount = invoice.amount_total
+                            elif invoice.amount_total > record.amount:
+                                amount = record.amount
                     else:
                         pay_term = invoice.invoice_payment_term_id.line_ids
                         term_day = 0
@@ -51,12 +52,13 @@ class AccountPayment(models.Model):
                         if due_date:
                             if due_date >= record.payment_date:
                                 # for payment in invoice.payment_ids.filtered(lambda x: x.id == record.id):
-                                for lines in invoice.invoice_line_ids:
-                                    line_total += lines.price_subtotal
-                                    if line_total <= record.amount:
-                                        amount = line_total
-                                    elif line_total > record.amount:
-                                        amount = record.amount
+                                # for lines in invoice.invoice_line_ids:
+                                    # line_total += lines.price_subtotal
+                                if invoice.amount_total <= record.amount:
+                                    # amount = line_total
+                                    amount = invoice.amount_total
+                                elif invoice.amount_total > record.amount:
+                                    amount = record.amount
                 record.current = amount
 
     @api.depends('reconciled_invoice_ids','invoice_line','amount')
@@ -80,12 +82,13 @@ class AccountPayment(models.Model):
                     if due_date:
                         if due_date < record.payment_date:
                             # for payment in invoice.payment_ids.filtered(lambda x: x.id == record.id):
-                            for lines in invoice.invoice_line_ids:
-                                line_total += lines.price_subtotal
-                                if line_total <= record.amount:
-                                    amount = line_total
-                                elif line_total > record.amount:
-                                    amount = record.amount
+                            # for lines in invoice.invoice_line_ids:
+                            #     line_total += lines.price_subtotal
+                            if invoice.amount_total <= record.amount:
+                                # amount = line_total
+                                amount = invoice.amount_total
+                            elif invoice.amount_total > record.amount:
+                                amount = record.amount
                     else:
                         pay_term = invoice.invoice_payment_term_id.line_ids
                         term_day = 0
@@ -96,12 +99,13 @@ class AccountPayment(models.Model):
                         if due_date:
                             if due_date < record.payment_date:
                                 # for payment in invoice.payment_ids.filtered(lambda x: x.id == record.id):
-                                for lines in invoice.invoice_line_ids:
-                                    line_total += lines.price_subtotal
-                                    if line_total <= record.amount:
-                                        amount = line_total
-                                    elif line_total > record.amount:
-                                        amount = record.amount
+                                # for lines in invoice.invoice_line_ids:
+                                #     line_total += lines.price_subtotal
+                                if invoice.amount_total <= record.amount:
+                                    # amount = line_total
+                                    amount = invoice.amount_total
+                                elif invoice.amount_total > record.amount:
+                                    amount = record.amount
                 record.arrears = amount
 
     @api.depends('current','arrears','amount')

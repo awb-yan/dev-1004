@@ -10,3 +10,7 @@
 
 - [IMP] Automatic Payment Matching
 - [FIX] Invoice lines should not update after reconciliation
+
+## [13.0.1.0.3] - 2021-07-09
+
+- [FIX] Disconnection
