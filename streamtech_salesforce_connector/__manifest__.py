@@ -21,7 +21,7 @@
         'security/ir.model.access.csv',
         'views/crm_view.xml',
         'views/partner_view.xml',
-        'views/views.xml'
+        'views/views.xml',
         'views/product_template_view.xml'
     ],
     'installable': True,
