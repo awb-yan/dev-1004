@@ -7,3 +7,6 @@ access_sale_zone_subtype,sale.zone_subtype,model_zone_subtype,sales_team.group_s
 access_sale_zone_subtype_manager,sale.zone_subtype manager,model_zone_subtype,sales_team.group_sale_manager,1,1,1,1
 access_proj_zone_subtype,project.zone_subtype,model_zone_subtype,project.group_project_user,1,0,0,0
 access_proj_zone_subtype_manager,project.zone_subtype manager,model_zone_subtype,project.group_project_manager,1,1,1,1
+access_move_in,project.move.in,model_project_move_in,base.group_user,1,1,1,1
+access_pm_sale_subscription,sale.subscription,model_sale_subscription,project.group_project_manager,1,0,0,0
+access_pm_sale_subscription_stage,sale.subscription.stage,model_sale_subscription_stage,project.group_project_manager,1,0,0,0

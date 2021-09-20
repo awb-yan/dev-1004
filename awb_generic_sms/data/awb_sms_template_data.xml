@@ -50,19 +50,35 @@ Hi ${partner_id} ${customer_number}. We've temporarily disconnected your account
         <record id="sms_template_subs_welcome" model="awb.sms.template">
             <field name="name">Subscription Welcome Notification</field>
             <field name="template_body">
-Hi ${partner_id}.
-Welcome to Streamtech, thank you for availing ${product_names} with ${product_desc}.
-You will receive another notice in [1-2] hours once your subscription has been activated.
-For any concerns, you may contact [Customer Portal, Customer Service]
+Hi ${partner_id}. 
+
+Thank you for subscribing to Streamtech Prepaid Fiber. Enjoy your  ${product_desc}.
+
+
+You will receive another notice within an hour, once your subscription has been activated. 
+For any concerns, you may contact (02)8808-2323 / 0919-057-8888 or visit www.streamtech.com.ph to know more.
             </field>
         </record>
 
         <record id="sms_template_subs_activation" model="awb.sms.template">
             <field name="name">Subscription Activation Notification</field>
             <field name="template_body">
-Hi ${partner_id}.
-Your account has been successfully activated. You may now enjoy unlimited access to ${product_desc}.
-For any inquiries and concerns, please contact us at [Link to Customer Portal, Customer Service]
+Hi ${partner_id}. 
+
+Your account has been successfully activated. 
+You may now enjoy unlimited access to ${product_desc}.
+
+For any inquiries and concerns, please contact us at
+(02)8808-2323 / 0919-057-8888 or visit www.streamtech.com.ph to know more.
+            </field>
+        </record>
+
+        <record id="sms_template_subs_expiry" model="awb.sms.template">
+            <field name="name">Subscription Expiry Notification</field>
+            <field name="template_body">
+Your Streamtech Prepaid Fiber subscription ${product_names} has ended today. ${datetime_now}. Top up your account at https://pavi.odoo.com/shop. 
+
+For any inquiries and concerns, please contact us at (02)8808-2323 / 0919-057-8888 or visit www.streamtech.com.ph to know more.
             </field>
         </record>
 

@@ -1,6 +1,9 @@
 import json
 import requests
 from odoo import exceptions
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class SmartAPIGateway(object):
@@ -38,6 +41,8 @@ class SmartAPIGateway(object):
         destination=None,
         text=None,
     ):
+        _logger.info('function: send_sms_now')
+
         data = {
             'messageType': message_type,
             'destination': destination,
@@ -55,6 +60,7 @@ class SmartAPIGateway(object):
         return res
 
     def send(self):
+        _logger.info('function:send')
         sms_data = []
         for record in self.recordset:
             status_code = None
@@ -68,6 +74,8 @@ class SmartAPIGateway(object):
                 )
                 status_code = res.status_code
                 state = "sent" if status_code == 201 else "failed"
+
+                _logger.debug(f'state (sent or failed): {state}')
 
             state_label = dict(self.sms_history._fields['state'].selection)[state]
 

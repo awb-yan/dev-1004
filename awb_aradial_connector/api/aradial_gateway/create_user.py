@@ -7,7 +7,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class AradialAPIGateway(object):
+class AradialAPIGatewayCreateUser(object):
     def __init__(
         self,
         url,
@@ -43,7 +43,5 @@ class AradialAPIGateway(object):
         
         state = "Success" if res.status_code == 201 else "Fail"
         _logger.info("response [%s]" % res)
-
-
 
         return state

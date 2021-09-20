@@ -3,6 +3,9 @@ from odoo.http import request
 
 import importlib
 import json
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 OdooAPI = importlib.import_module(
@@ -87,4 +90,5 @@ class OdooAPI(OdooAPI):
                 }
             }
 
+            _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
             return res

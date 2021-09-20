@@ -32,9 +32,16 @@
                             <field name="active" invisible="1" />
                         </group>
                         <group>
-                            <field name="currency" />
-                            <field name="min_amount" widget="monetary" options="{'currency_field': 'currency'}"/>
-                            <field name="max_amount" widget="monetary" options="{'currency_field': 'currency'}"/>
+                            <field name="currency"
+                                   attrs="{'required':[('approval_type','=','amount')], 'invisible': [('approval_type','=','none')]}" />
+                            <field name="min_amount" 
+                                   widget="monetary" 
+                                   attrs="{'required':[('approval_type','=','amount')], 'invisible': [('approval_type','=','none')]}"
+                                   options="{'currency_field': 'currency'}"/>
+                            <field name="max_amount" 
+                                   widget="monetary" 
+                                   attrs="{'required':[('approval_type','=','amount')], 'invisible': [('approval_type','=','none')]}"
+                                   options="{'currency_field': 'currency'}"/>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>

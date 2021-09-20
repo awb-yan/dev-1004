@@ -11,11 +11,33 @@ class ApprovalRequest(models.Model):
 
     has_department = fields.Selection(related='category_id.has_department')
     has_manager = fields.Selection(related='category_id.has_manager')
-
     department_id = fields.Many2one('hr.department', String='Department')
     manager_id = fields.Many2one('hr.employee', String='Manager')
+    can_approve = fields.Boolean(string='Can Approve', compute='_check_can_approve', default=False)
 
-    can_approve = fields.Boolean(string='Can Approve', compute='_check_can_approve' ,default=False)
+    @api.onchange('request_owner_id')
+    def _onchange_request_owner(self):
+        for record in self:
+            request_owner = record.request_owner_id.mapped('employee_ids').filtered(lambda x: x.company_id == record.company_id)
+            department = False
+            for owner in request_owner:
+                department = owner.department_id
+            record.department_id = department
+
+    @api.onchange('department_id')
+    def _onchange_department(self):
+        for record in self:
+            request_owner = record.request_owner_id.mapped('employee_ids').filtered(lambda x: x.company_id == record.company_id)
+            manager = False
+            if request_owner:
+                for owner in request_owner:
+                    if record.department_id == owner.department_id:
+                        manager = owner.parent_id
+                    else:
+                        manager = record.department_id.manager_id
+            else:
+                manager = record.department_id.manager_id
+            record.manager_id = manager
 
     @api.constrains('amount')
     def _check_amount(self):
@@ -56,23 +78,26 @@ class ApprovalRequest(models.Model):
         head_id = self.mapped('department_id').operation_head.user_id.id
         users = [manager_id, head_id]
 
-        args = [
-            ('category', '=', self.category_id.id),
-            # ('department', '=', self.department_id.id),
-            # ('approval_type', '=', 'amount'),
-            ('min_amount', '<=', self.amount),
-            ('max_amount', '>=', self.amount),
+        approval_rule = False
+        new_args = [
+            ('category', '=', self.category_id.id)
         ]
-        approval_rule = self.sudo().env['approval.rule'].search(args, limit=1)
+        new_approval = self.sudo().env['approval.rule'].search(new_args)
+        for rule in new_approval:
+            if rule.approval_type == 'none':
+                approval_rule = rule
+            else:
+                if rule.min_amount <= self.amount and rule.max_amount >= self.amount:
+                    approval_rule = rule
 
+        if not approval_rule:
+            raise UserError(_('Approval Request cannot be proceed. Please Contact your System Administrator'))
+        
         category = self.mapped('category_id')
-        if category.rule_ids:
-            if not approval_rule:
-                raise UserError(_('Approval Request cannot be proceed. Please Contact your System Administrator'))
-        else:
-            raise UserError(_('Rules not found in this Category'))
-
         rule = category.rule_ids.filtered(lambda rule: rule.id == approval_rule.id)
+        if not rule:
+            raise UserError(_('Approval Request cannot be proceed. Please Contact your System Administrator'))
+
         if rule.manager_id:
             if manager_id:
                 data = self._get_data_approvers(manager_id, self.id, add_sequence, 'and')
@@ -149,7 +174,7 @@ class ApprovalRequest(models.Model):
     def _compute_request_status(self):
         for request in self:
             status_lst = request.mapped('approver_ids.status')
-            minimal_approver = request.approval_minimum if len(status_lst) >= request.approval_minimum else len(status_lst)
+            # minimal_approver = request.approval_minimum if len(status_lst) >= request.approval_minimum else len(status_lst)
             if status_lst:
                 if status_lst.count('cancel'):
                     status = 'cancel'

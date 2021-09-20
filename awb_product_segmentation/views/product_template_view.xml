@@ -17,9 +17,9 @@
         <field name="model">product.category</field>
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='account_property']" position="after">
-                <group string="Category Type">
-                    <field name="category_type" string="Type"/>
+            <xpath expr="//group[@name='account_property']" position="before">
+                <group string="Segmentation">
+                    <field name="category_type" string="Service Type"/>
                 </group>
             </xpath>
         </field>

@@ -21,7 +21,7 @@
 
     'category': 'Localization',
 
-    'version': '13.0.1.0.0',
+    'version': '13.0.1.2.0',
 
     'depends': ['account_accountant', 'base_address_city', 'contact_record', 'contacts', 'hr', 'mail', 'project', 'sale_management', 'sale_subscription'],
 
@@ -33,8 +33,8 @@
         'views/project_view.xml',
         'views/sale_subscription_view.xml',
         'views/sale_view.xml',
-        # 'views/penetration_rate_view.xml',
-        # 'views/active_subscriber_view.xml',
+        'views/penetration_rate_view.xml',
+        'views/active_subscriber_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

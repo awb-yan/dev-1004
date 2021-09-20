@@ -53,7 +53,7 @@ class AccountMoveBatch(models.Model):
     name = fields.Char(string='Sequence', readonly=True, default="MASS INV/", required=True)
     invoice_type = fields.Selection([('cust_invoice', 'Customer Invoice')],
                                     string="Invoice Type", default='cust_invoice')
-    company_id = fields.Many2one('res.company', string='Company', default=_get_company_default, readonly=True, copy=False, required=True,)
+    company_id = fields.Many2one('res.company', string='Company', default=_get_company_default, copy=False, required=True,)
     rebate_date = fields.Date(string="Date", required=True, default=fields.Date.today())
     journal_id = fields.Many2one('account.journal', string='Journal', required=True, default=_default_journal, 
                                  domain="['|', ('company_id', '=', False), ('company_id', '=', company_id), ('type', '=', 'sale')]")
@@ -105,18 +105,19 @@ class AccountMoveBatch(models.Model):
             device_id = self.env.ref('awb_subscriber_product_information.product_device_fee').id
             for sub_line in sub.recurring_invoice_line_ids:
                 if sub_line.product_id.id != device_id:
-                    data = {
-                        'date': self.rebate_date,
-                        'subscription_line_id': sub_line.id,
-                        'partner_id': partner.id,
-                        'product_id': sub_line.product_id.id,
-                        'company_id': sub_line.company_id.id,
-                        'description': sub_line.name,
-                        'uom_id': sub_line.uom_id.id,
-                        'amount': 0
-                    }
+                    if sub_line.product_id.product_tmpl_id.product_segmentation != 'device':
+                        data = {
+                            'date': self.rebate_date,
+                            'subscription_line_id': sub_line.id,
+                            'partner_id': partner.id,
+                            'product_id': sub_line.product_id.id,
+                            'company_id': sub_line.company_id.id,
+                            'description': sub_line.name,
+                            'uom_id': sub_line.uom_id.id,
+                            'amount': 0
+                        }
 
-                    sub_product.append((0, 0, data))
+                        sub_product.append((0, 0, data))
         self.update({'invoice_ids': None})
         self.update({'invoice_ids': sub_product})
         

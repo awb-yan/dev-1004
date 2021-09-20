@@ -58,15 +58,16 @@ class SalesForceImporterProducts(models.Model):
 
             if product.get('Facility_Type__c'):
                 category_name = product['Facility_Type__c']
-                sub_category = self.env['product.category'].search([('name', '=', category_name)])
-                if not sub_category:
-                    category = self.env['product.category'].create({
-                        'name': category_name,
-                        'parent_id': category.id
-                    })
-                    self.env.cr.commit()
-                else:
-                    category = sub_category
+                if category_name != 'N/A':
+                    sub_category = self.env['product.category'].search([('name', '=', category_name), ('parent_id', '=', category.id)])
+                    if not sub_category:
+                        category = self.env['product.category'].create({
+                            'name': category_name,
+                            'parent_id': category.id
+                        })
+                        self.env.cr.commit()
+                    else:
+                        category = sub_category
 
             bandwidth = product.get('Bandwidth__c', '0')
             if bandwidth:
