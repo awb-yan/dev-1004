@@ -1,31 +1,29 @@
 <?xml version="1.0" ?>
 <odoo>
-  <record id="auto_action_subs_sms_welcome" model="base.automation">
-    <field name="name">[Subscription] Send Welcome SMS on Create</field>
-    <field name="type">base.automation</field>
-    <field name="model_id" ref="sale_subscription.model_sale_subscription" />
-    <field name="active">True</field>
-    <field name="trigger">on_create</field>
-    <field name="filter_domain">[["stage_id","=",1]]</field>
-    <field name="state">code</field>
-    <field name="code">
-env["awb.sms.send"]._send_subscription_notif(recordset=records, template_name="Subscription Welcome Notification", state="Draft")
-    </field>
-  </record>
-
-  <record id="auto_action_subs_sms_activation" model="base.automation">
-    <field name="name">[Subscription] Send Activation SMS on Update</field>
+  <record id="auto_action_subs_send_expiry_notif" model="base.automation">
+    <field name="name">Subscription Send Expiry SMS</field>
     <field name="type">base.automation</field>
     <field name="model_id" ref="sale_subscription.model_sale_subscription" />
     <field name="active">True</field>
     <field name="trigger">on_write</field>
-    <field name="trigger_field_ids" eval="[(4, ref('sale_subscription.field_sale_subscription__stage_id'))]"/>
-    <field name="filter_pre_domain">[["stage_id","=",1]]</field>
-    <field name="filter_domain">[["stage_id","=",2]]</field>
+    <field name="trigger_field_ids" eval="[
+      (4, ref('awb_subscriber_bill_automation.field_sale_subscription__subscription_status')),
+      (4, ref('awb_subscriber_bill_automation.field_sale_subscription__subscription_status_subtype'))
+    ]"/>
+    <field name="filter_pre_domain">[
+      "|",
+      ["subscription_status", "!=", "disconnection"],
+      ["subscription_status_subtype", "!=", "disconnection-temporary"],
+    ]</field>
+    <field name="filter_domain">[
+      ["stage_id","=",2],
+      ["subscription_status","=","disconnection"],
+      ["subscription_status_subtype","=","disconnection-temporary"],
+      ["recurring_invoice_line_ids.product_id.sf_plan_type","=","Prepaid"]
+    ]</field>
     <field name="state">code</field>
     <field name="code">
-# Draft to In Progress
-env["awb.sms.send"]._send_subscription_notif(recordset=records, template_name="Subscription Activation Notification", state="In Progress")
+env["awb.sms.send"]._send_subscription_notif(recordset=records, template_name="Subscription Expiry Notification", state="In Progress")
     </field>
   </record>
 </odoo>

@@ -4,6 +4,9 @@ from .authentication import OdooAPI
 
 import importlib
 import json
+import logging
+
+_logger = logging.getLogger(__name__)
 
 Serializer = importlib.import_module(
     "odoo.addons.odoo-rest-api"
@@ -23,7 +26,6 @@ class OdooAPI(OdooAPI):
     def _disconnect_subs(
         self, channel, discon_type, subscriptions
     ):
-
         no_permission = self._no_permission()
         if no_permission:
             return no_permission
@@ -34,12 +36,11 @@ class OdooAPI(OdooAPI):
         if invalid_params:
             return invalid_params
 
-        # Get the discon type
-        discon_status = request.env[SUBSCRIPTION]._get_discon_type(
-            discon_type=discon_type.lower(), channel=channel.lower()
+        source = request.env[SUBSCRIPTION]._get_discon_type(
+            discon_type=discon_type.lower(), channel=channel
         )
 
-        if not discon_status:
+        if not source:
             http.Response.status = "400"
             res = {
                 "errors": {
@@ -53,19 +54,33 @@ class OdooAPI(OdooAPI):
                 }
             }
 
+            _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
             return json.dumps(res)
+        _logger.info(f"----- Disconnection from {source.get('name')} -----")
 
-        # Extracting code in subscriptions
-        subscription_codes = [
-            sub['code'] for sub in subscriptions
-            if "code" in sub
-        ]
+        # Get the discon type on Odoo
+        discon_status = request.env[SUBSCRIPTION]._get_discon_type(
+            discon_type=discon_type.lower(), channel="od"
+        )
+
+        sms_ids = []
+        subscription_codes = []
+        for sub in subscriptions:
+            code = sub.get("code")
+            sms_id = sub.get("smsid")
+            if code:
+                subscription_codes.append(code)
+            elif sms_id:
+                sms_ids.append(sms_id)
 
         subscription_records = request.env[SUBSCRIPTION].search([
-            ("code", "in", subscription_codes)
+            "|",
+            ("code", "in", subscription_codes),
+            ("opportunity_id.jo_sms_id_username", "in", sms_ids)
         ])
 
         if subscription_records.exists() and discon_status:
+            executed = False
             function = discon_status.get("executable")
             if function:
                 # Call function
@@ -73,9 +88,19 @@ class OdooAPI(OdooAPI):
                     "request.env[SUBSCRIPTION].%s"
                     % function
                 )
-                executable(subscription_records, discon_status.get("status"))
+                executed = executable(subscription_records, discon_status.get("status"))
 
-            http.Response.status = "200"
+            if executed:
+                http.Response.status = "200"
+                status = 200
+                message = "200 OK"
+                code = 200
+            else:
+                http.Response.status = "201"
+                status = 201
+                message = "201 OK"
+                code = 201
+
             serializer = Serializer(
                 subscription_records,
                 "{id, code, display_name, partner_id, subscription_status_subtype}",
@@ -84,9 +109,9 @@ class OdooAPI(OdooAPI):
             data = serializer.data
             res = {
                 "success": {
-                    "status": 200,
-                    "message": "200 OK",
-                    "code": 200,
+                    "status": status,
+                    "message": message,
+                    "code": code,
                     "description": "",
                     "links": {
                         "about": "",
@@ -95,7 +120,24 @@ class OdooAPI(OdooAPI):
                 "data": data,
             }
 
+            _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
             return res
+
+        http.Response.status = "400"
+        res = {
+            "errors": {
+                "status": 400,
+                "code": 4002,
+                "message": "400 Bad Request",
+                "description": "Incorrect Values",
+                "links": {
+                    "about": ""
+                },
+            }
+        }
+
+        _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
+        return json.dumps(res)
 
     def _check_params(self, channel, discon_type, subscriptions):
         missing_params = ""
@@ -120,4 +162,5 @@ class OdooAPI(OdooAPI):
                 }
             }
 
+            _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
             return json.dumps(res)

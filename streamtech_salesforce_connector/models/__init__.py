@@ -7,3 +7,4 @@ from . import salesforce_importer_opportunities
 from . import salesforce_importer_customers
 from . import models
 from . import product_template
+from . import awb_salesforce_connector

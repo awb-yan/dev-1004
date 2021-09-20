@@ -12,7 +12,7 @@ class ProjectMoveIn(models.Model):
 		return self.env['project.project'].search([('id', '=', project.id)], limit=1).id
 
 	date = fields.Date(default=datetime.now(), store=True)
-	move_in = fields.Integer(store=True)
+	move_in = fields.Integer(required=True, store=True)
 	project_id = fields.Many2one('project.project', store=True, default=_default_project)
 
 
@@ -20,9 +20,10 @@ class CustomProject(models.Model):
 	_inherit = 'project.project'
 
 	move_in_lines = fields.One2many('project.move.in', 'project_id', copy=False, ondelete='cascade')
-	move_in_number = fields.Integer(compute='_compute_move_in_total', default = 0)
+	move_in_number = fields.Integer(compute='_compute_move_in_total')
 	house_pass_number = fields.Integer(store=True)
 	move_in_line_ids = fields.Many2one()
+	move_in_count = fields.Integer(compute='_compute_move_in_count')
 
 
 	def move_in_button(self):
@@ -35,6 +36,10 @@ class CustomProject(models.Model):
 			'type': 'ir.actions.act_window',
 			'domain': [('project_id', '=', self.id)],
 		}
+
+	def _compute_move_in_count(self):
+		for rec in self:
+			rec.move_in_count = len(rec.move_in_lines)
 
 	@api.depends('move_in_lines')
 	def _compute_move_in_total(self):
