@@ -15,6 +15,9 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+class SaleSubscription1(models.Model):
+    _inherit = "sale.subscription"
+    subscription_status = fields.Selection(selection_add=[('transfer', 'Transfer')])
 
 class SaleSubscription(models.Model):
     _inherit = "sale.subscription"
