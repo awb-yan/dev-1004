@@ -174,6 +174,8 @@ class SalesForceImporterOpportunities(models.Model):
             subscription_status = 'disconnection'
         elif subscription_status == 'Pre-Termination':
             subscription_status = 'pre-termination'
+        elif subscription_status == 'Transfer':
+            subscription_status = 'transfer'
         else:
             subscription_status = ''
 
