@@ -108,6 +108,17 @@ class CRMLead(models.Model):
                                       })
                 _logger.debug(f'Reconnect {subscriber_id}')
 
+            elif self.subscription_status == 'transfer':
+                # TODO for Final Requirement : Update Existing Record - Used for Address Update
+                subscriber_id = self.sudo().env['sale.subscription'].search([('partner_id', '=', self.partner_id.id), (
+                    'account_identification', '=', self.account_identification), ('stage_id', '=', self.env.ref(
+                        'sale_subscription.sale_subscription_stage_closed').id)], order='date_start desc', limit=1)
+
+                subscriber_id.update({'stage_id': self.env.ref('sale_subscription.sale_subscription_stage_in_progress').id,
+                                      'subscription_status': self.subscription_status,
+                                      })
+                _logger.debug(f'Transfer {subscriber_id}')
+
             elif self.subscription_status in ('upgrade', 'convert', 'downgrade'):
                 domain = [('partner_id', '=', self.partner_id.id),
                           ('account_identification', '=', self.account_identification),
