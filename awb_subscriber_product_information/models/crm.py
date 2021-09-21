@@ -84,6 +84,7 @@ class CRMLead(models.Model):
                                             ('upgrade', 'Upgrade'),
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
+                                            ('transfer', 'Transfer'),
                                             ('re-contract', 'Re-contract'),
                                             ('pre-termination', 'Pre-Termination'),
                                             ('disconnection', 'Disconnection'),
