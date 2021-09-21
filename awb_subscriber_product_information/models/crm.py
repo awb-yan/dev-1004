@@ -24,9 +24,6 @@ class CRMProductLine(models.Model):
     unit_price = fields.Float('Unit Price')
     total_price = fields.Float('Total Price')
 
-class CRMLead1(models.Model):
-    _inherit = 'crm.lead'
-    subscription_status = fields.Selection(selection_add=[('transfer', 'Transfer')])
 
 class CRMLead(models.Model):
     _inherit = 'crm.lead'
@@ -83,10 +80,11 @@ class CRMLead(models.Model):
                                          ('for operations head discount approval', 'For Operations Head Discount Approval'),
                                          ('operations head discount approved', 'Operations Head Discount Approved'),
                                          ('operations head discount rejected', 'Operations Head Discount Rejected')], string="Job Order Status")
-    subscription_status = fields.Selection([('new', 'New'),
+    subscription_status = fields.Selection(selection_add=[('new', 'New'),
                                             ('upgrade', 'Upgrade'),
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
+                                            ('transfer', 'Transfer'),
                                             ('re-contract', 'Re-contract'),
                                             ('pre-termination', 'Pre-Termination'),
                                             ('disconnection', 'Disconnection'),
