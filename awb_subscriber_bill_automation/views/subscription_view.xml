@@ -28,6 +28,10 @@
                 <field name="date_start" attrs="{}"/>
                 <field name="date_end" attrs="{}"/>
             </xpath>
+
+            <xpath expr="//field[@name='date_start']" position="after">
+                <field name="plan_type"/>
+            </xpath>
         </field>
     </record>
 
