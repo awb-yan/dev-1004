@@ -22,15 +22,15 @@ class SaleSubscription(models.Model):
     account_identification = fields.Char(string="Account ID")
     customer_number = fields.Char(related='partner_id.customer_number')
     opportunity_id = fields.Many2one('crm.lead', string='Opportunity')
-    subscription_status = fields.Selection(selection_add=[('transfer', 'Transfer')])
-    # subscription_status = fields.Selection([('new', 'New'),
-    #                                         ('upgrade', 'Upgrade'),
-    #                                         ('convert', 'Convert'),
-    #                                         ('downgrade', 'Downgrade'),
-    #                                         ('re-contract', 'Re-contract'),
-    #                                         ('pre-termination', 'Pre-Termination'),
-    #                                         ('disconnection', 'Disconnection'),
-    #                                         ('reconnection', 'Reconnection')], default='new', string="Subscription Status")
+    subscription_status = fields.Selection([('new', 'New'),
+                                            ('upgrade', 'Upgrade'),
+                                            ('convert', 'Convert'),
+                                            ('downgrade', 'Downgrade'),
+                                            ('transfer', 'Transfer'),
+                                            ('re-contract', 'Re-contract'),
+                                            ('pre-termination', 'Pre-Termination'),
+                                            ('disconnection', 'Disconnection'),
+                                            ('reconnection', 'Reconnection')], default='new', string="Subscription Status")
     subscription_status_subtype = fields.Selection([('disconnection-permanent', 'Permanent Discon'),
                                             ('disconnection-temporary', 'Temporary Discon')], string="Subscription Status Subtype")
 
