@@ -22,7 +22,7 @@ class SaleSubscription(models.Model):
     account_identification = fields.Char(string="Account ID")
     customer_number = fields.Char(related='partner_id.customer_number')
     opportunity_id = fields.Many2one('crm.lead', string='Opportunity')
-    subscription_status = fields.Selection([('new', 'New'),
+    subscription_status = fields.Selection(selection_add=[('new', 'New'),
                                             ('upgrade', 'Upgrade'),
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
