@@ -26,11 +26,11 @@ class SaleSubscription(models.Model):
                                             ('upgrade', 'Upgrade'),
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
+                                            ('transfer', 'Transfer'),
                                             ('re-contract', 'Re-contract'),
                                             ('pre-termination', 'Pre-Termination'),
                                             ('disconnection', 'Disconnection'),
                                             ('reconnection', 'Reconnection')], default='new', string="Subscription Status")
-    subscription_status = fields.Selection(selection_add=[('transfer', 'Transfer')])
     subscription_status_subtype = fields.Selection([('disconnection-permanent', 'Permanent Discon'),
                                             ('disconnection-temporary', 'Temporary Discon')], string="Subscription Status Subtype")
 
