@@ -80,7 +80,7 @@ class CRMLead(models.Model):
                                          ('for operations head discount approval', 'For Operations Head Discount Approval'),
                                          ('operations head discount approved', 'Operations Head Discount Approved'),
                                          ('operations head discount rejected', 'Operations Head Discount Rejected')], string="Job Order Status")
-    subscription_status = fields.Selection(selection_add=[('new', 'New'),
+    subscription_status = fields.Selection([('new', 'New'),
                                             ('upgrade', 'Upgrade'),
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
