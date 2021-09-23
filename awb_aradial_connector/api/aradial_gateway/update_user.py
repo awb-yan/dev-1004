@@ -28,10 +28,11 @@ class AradialAPIGatewayUpdateUser(object):
 
 
     def update_user(self):
+        _logger.info('function: update_user')
 
         try:
-            res = requests.post(
-                url=self.url,
+            res = requests.put(
+                url=self.url+'/'+self.data['UserID'],
                 headers=self.headers,
                 data=json.dumps(self.data),
                 auth=HTTPBasicAuth(self.username, self.password)
@@ -39,9 +40,10 @@ class AradialAPIGatewayUpdateUser(object):
         except requests.exceptions.MissingSchema as e:
             raise exceptions.ValidationError(e)
 
-        _logger.info(res.json())
-        
-        state = True if res.status_code == 201 else False
-        _logger.info("response [%s]" % res)
+        if res.status_code != 204:
+            update_state = False
+            _logger.error('!!! Error Updating Offer to '+self.data['Offer']+' for Subscriber '+self.data['UserID'])
+        else:
+            update_state = True
 
-        return state
+        return update_state

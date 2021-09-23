@@ -52,11 +52,23 @@ Hi ${partner_id} ${customer_number}. We've temporarily disconnected your account
             <field name="template_body">
 Hi ${partner_id}. 
 
-Thank you for subscribing to Streamtech Prepaid Fiber. Enjoy your  ${product_desc}.
+Thank you for subscribing to Streamtech Prepaid Fiber. Enjoy your ${product_desc}.
 
 
 You will receive another notice within an hour, once your subscription has been activated. 
 For any concerns, you may contact (02)8808-2323 / 0919-057-8888 or visit www.streamtech.com.ph to know more.
+            </field>
+        </record>
+
+        <record id="sms_template_subs_ctp" model="awb.sms.template">
+            <field name="name">Subscription CTP Notification</field>
+            <field name="template_body">
+Hi ${partner_id}. 
+
+You have successfully replenished your prepaid plan.
+Continue enjoying ${product_desc}.
+
+For any inquiries and concerns, please contact us at (02)8808-2323 / 0919-057-8888 or visit www.streamtech.com.ph to know more.
             </field>
         </record>
 

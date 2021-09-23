@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [13.0.1.2.4] - 2021-09-22
+   - [ADD] Added new field to pull from SF import of Products (Days_Duration__c) 
+   - [ADD] Auto creation of Subscription Template for Prepaid plan type
+
+## [13.0.1.2.3] - 2021-09-21
+   - [ADD] Company setup upon creation of Contacts from SF Opportunity Pull
+   - [ADD] Add value and flow for `Transfer` to Subscription Status
+
 ## [13.0.1.2.2] - 2021-09-20
    - [FIX] Added fix for sf import of products with N/A Facility Type
    - [FIX] Display of Product new fields in Subscription Product form

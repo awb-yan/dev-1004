@@ -66,7 +66,7 @@ class AWBAradialConnector(models.Model):
         self, 
         data
     ):
-        _logger.info("Update User's Timebank")
+        _logger.info("Update User")
         
         params = self.env['ir.config_parameter'].sudo()
         self.aradial_url = params.get_param('aradial_url')
@@ -79,9 +79,8 @@ class AWBAradialConnector(models.Model):
             password=self.aradial_password,
             data=data
         )
-        updated_user = user.update_user()
 
-        # _logger.info("User Creation: %s" % created_user)
+        updated_user = user.update_user()
 
         return updated_user        
     

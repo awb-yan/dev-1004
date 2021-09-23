@@ -85,6 +85,21 @@ class SalesForceImporterProducts(models.Model):
             else: 
                 prod_plan_type = None
             
+            if plan_type == 'Prepaid':
+                keyword = product['ProductCode']
+                subscription_template = self.env['sale.subscription.template'].search([('name','ilike',keyword)], limit=1)
+                if not subscription_template:
+                    self.env['sale.subscription.template'].create({
+                        'name': keyword,
+                        'recurring_interval': product['Days_Duration__c'] if product['Days_Duration__c'] else 0,
+                        'recurring_rule_type': 'daily',
+                        'recurring_rule_boundary': 'limited',
+                        'recurring_rule_count': 1,
+                        'payment_mode': 'draft_invoice'
+                    })
+                    
+                    self.env.cr.commit()
+
             facility_type = product.get('Facility_Type__c')
             if facility_type:
                 product_facility_type = self.env['product.facility.type'].search([('name', '=', facility_type)], limit=1)
@@ -142,6 +157,7 @@ class SalesForceImporterProducts(models.Model):
                 ", Monthly_Subscription_Fee__c " \
                 ", CreatedDate, LastModifiedDate " \
                 ", Plan_Type__c " \
+                ", Days_Duration__c " \
                 " FROM Product2 " \
                 " WHERE IsActive = True"
 

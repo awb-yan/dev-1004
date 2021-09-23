@@ -12,19 +12,22 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+# class ProductTemplate(models.Model):
+#     _inherit = 'product.template'
 
-    sf_plan_type = fields.Many2one('product.plan.type', string="Plan Type", tracking=True)
-    sf_facility_type = fields.Many2one('product.facility.type', string="Facility Type", tracking=True)
+#     sf_plan_type = fields.Many2one('product.plan.type', string="Plan Type", tracking=True)
+#     sf_facility_type = fields.Many2one('product.facility.type', string="Facility Type", tracking=True)
     
 
-class ProductPlanType(models.Model):
-    _name = 'product.plan.type'
-    _description = 'Plan Type'
+# class ProductPlanType(models.Model):
+#     _name = 'product.plan.type'
+#     _description = 'Plan Type'
 
-    name = fields.Char('Name', required=True, tracking=True)
-    description = fields.Text('Description')
+#     name = fields.Char('Name', required=True, tracking=True)
+#     description = fields.Text('Description')
+
+# access_sale_product_plan_type,product.plan.type,model_product_plan_type,sales_team.group_sale_salesman,1,0,0,0
+# access_sale_product_plan_type_manager,product.plan.type manager,model_product_plan_type,sales_team.group_sale_manager,1,1,1,1
 
 
 class ProductFacilityType(models.Model):

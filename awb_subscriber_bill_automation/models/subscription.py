@@ -9,6 +9,8 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+# import pytz
+
 import json
 
 import logging
@@ -44,18 +46,20 @@ class SaleSubscription(models.Model):
 
     # New Fields
 
-    plan_type = fields.Char(compute='_compute_plan_type')
+    plan_type = fields.Many2one('product.plan.type', compute='_compute_plan_type')
 
     # Business Logic
 
-    # TODO 
     @api.depends('recurring_invoice_line_ids')
     def _compute_plan_type(self):
         for rec in self:
-            rec.plan_type = ''
+            plan_type_id = []
             for lines in rec.recurring_invoice_line_ids:
                 if lines.product_id.product_tmpl_id.product_segmentation == 'month_service':
-                    rec.plan_type = lines.product_id.product_tmpl_id.sf_plan_type.name
+                    plan_type_id = lines.product_id.product_tmpl_id.sf_plan_type
+                    # plan_type_result = self.env['product.plan.type'].search([('id','=',plan_type_id)])
+
+            rec.plan_type = plan_type_id
 
 
     @api.model
@@ -65,7 +69,7 @@ class SaleSubscription(models.Model):
         # vals['atm_ref_sequence'] = self.env['ir.sequence'].next_by_code('subscription.atm.reference.seq.code')
         res = super(SaleSubscription, self).create(vals)
 
-        _logger.info('function: create')
+        _logger.info('SMS::function: create')
         self.record = res
         sms_flag = True
         plan_type = ''
@@ -74,23 +78,24 @@ class SaleSubscription(models.Model):
 
         try:
             main_plan = self._get_mainplan(self.record)        
-            _logger.debug(f'Main_Plan: {main_plan}')
+            _logger.debug(f'SMS::Main_Plan: {main_plan}')
 
             plan_type = main_plan.sf_plan_type.name
             if plan_type == 'Postpaid':
                 sms_flag = False
 
         except:
-            _logger.warning("Main Plan not found")
+            _logger.warning("SMS:: Main Plan not found")
             sms_flag = False
 
         if sms_flag and plan_type == 'Prepaid':
             sf_update_type = 6
-            last_subscription = self._checkLastActiveSubscription(self.record, plan_type)
+            last_subscription = self._get_last_subscription(self.record, plan_type)
 
             # CTP flow for prepaid, 
             if last_subscription:
                 ctp = True   
+                
                 self.record = self._update_new_subscription(self.record, last_subscription)
                 # self.record.opportunity_id = last_subscription.opportunity_id
                 # Process System Discon
@@ -98,9 +103,9 @@ class SaleSubscription(models.Model):
                 try:
                     is_closed_subs = True
                     subtype = "disconnection-temporary"
-                    self.env['sale.subscription']._change_status_subtype(last_subscription, subtype, is_closed_subs)
+                    self.env['sale.subscription']._change_status_subtype(last_subscription, subtype, is_closed_subs, ctp)
                 except:
-                    _logger.error(f'!!! Failed Temporary Discon - Subscription code {self.record.code}')
+                    _logger.error(f'SMS:: !!! Failed Temporary Discon - Subscription code {self.record.code}')
 
             self.env['sale.subscription'].provision_and_activation(self.record, main_plan, last_subscription, ctp)
 
@@ -114,7 +119,7 @@ class SaleSubscription(models.Model):
 
     # TODO For Clean up, refer to compute plan type
     def _get_mainplan(self, record):
-        _logger.info('function: get_mainplan')
+        _logger.info('SMS:: function: get_mainplan')
 
         main_plan = ''
 
@@ -128,48 +133,45 @@ class SaleSubscription(models.Model):
         return main_plan  
 
 
-    def _checkLastActiveSubscription(self, record, plan_type):
-        _logger.info('function: checkLastActiveSubs')
+    def _get_last_subscription(self, record, plan_type):
+        _logger.info('SMS:: function: _get_last_subscription')
         customer_id = record.customer_number
 
-        _logger.debug(f'Subscription Code: {record.code}')
-        _logger.debug(f'Customer Number: {customer_id}')
+        _logger.debug(f'SMS:: Subscription Code: {record.code}')
+        
+        _logger.debug(f'SMS:: Customer Number: {customer_id}')
 
-        activeSubs = self.env['sale.subscription'].search([('customer_number','=', customer_id),('subscription_status', '!=', 'disconnection')], order='id desc')
+        last_subscription = False
+        subscriptions = self.env['sale.subscription'].search([('customer_number','=', customer_id),('plan_type','=', plan_type)], order='id desc', limit=2)
+        
+        if len(subscriptions) == 2:
+            last_subscription = subscriptions[1]
+            _logger.debug(f'SMS::_get_last_subscription subscription[0]: {subscriptions[0].code}, subscription[1]: {subscriptions[1].code}')
 
-        # Checking for existing subscriptions
-        # For Postpaid, only one subscription at a time is allowed
-        # For Prepaid, multiple subscriptions are allowed; however, to avoid confusion, only 2 at a time will be allowed
-        if plan_type == 'Postpaid':
-            if len(activeSubs) >= 2:
-                _logger.warning(f'!!! Multiple Postpaid subscription not allowed for Customer {customer_id}')
-            else:
-                return False
-        else:
-            if len(activeSubs) > 2:
-                _logger.error(f'!!! Multiple prepaid subscription found for Customer {customer_id}')
-            elif len(activeSubs) == 2:
-                return activeSubs[1]
-            else:
-                return False
+        return last_subscription
+
 
     def _update_account(self, main_plan, rec, sf_update_type, max_retries):
+        _logger.debug(f'SMS:: _update_account')
         try:
             self.env['sale.subscription'].update_account(rec, sf_update_type, main_plan)
         except:
             if max_retries > 1:
                 self._update_account(main_plan, rec, sf_update_type, max_retries-1)
             else:
-                _logger.error(f'!!! Failed SF Update Account Status - Subscription code {rec.code}')
+                _logger.error(f'SMS:: !!! Failed SF Update Account Status - Subscription code {rec.code}')
                 raise Exception(f'!!! Failed SF Update Account Status - Subscription code {rec.code}')
     
     def _update_new_subscription(self, record, last_subscription):
-        _logger.info('function: _update_new_subscription')
+        _logger.info('SMS:: function: _update_new_subscription')
+
         self.record = record
-        self.record['opportunity_id'] = last_subscription.opportunity_id
+        self.record['opportunity_id'] = last_subscription.opportunity_id.id
         self.record['atm_ref'] = last_subscription.atm_ref
+        
         self.env.cr.commit()
 
+        _logger.debug(f'SMS:: New Subscription: {self.record}')
         return self.record
 
 
@@ -185,6 +187,7 @@ class SaleSubscription(models.Model):
 
     @api.depends("atm_ref_sequence")
     def _compute_atm_reference_number(self):
+        _logger.debug(f'SMS:: _compute_atm_reference_number')
         for rec in self:
             rec.atm_ref = ''
             if rec.atm_ref_sequence:
@@ -497,8 +500,17 @@ class SaleSubscription(models.Model):
 
 
     def _get_datetime_now(self):
-        for rec in self:
+        _logger.info(f'SMS:: function: _get_datetime_now')    
+        try:
+            # timezone = self.env.user.tz or pytz.utc
+            # now = datetime.datetime.now(pytz.timezone(timezone))
+            for rec in self:
+                rec.datetime_now = datetime.now().strftime("%m/%d/%Y %I:%M %p")
+                _logger.debug(f'SMS::rec.datetime_now {rec.datetime_now}')
+        except:
+            _logger.error(f'SMS:: Error encountered in getting date and time..') 
             rec.datetime_now = datetime.now().strftime("%m/%d/%Y %I:%M %p")
+    
 
 
 class SaleSubscriptionLine(models.Model):

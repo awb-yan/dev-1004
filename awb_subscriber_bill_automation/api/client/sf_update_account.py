@@ -1,5 +1,8 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+import datetime
+# import pytz
+
 
 import logging
 
@@ -10,21 +13,39 @@ class SalesForceConnector(models.Model):
 
     def update_account(self, record=None, update_type=None, main_plan=None):
         _logger.info('function: SalesForceConnector => update_account')
+
+        now = datetime.now() + datetime.timedelta(hours=8)
         
         if record:
             self.data = {}
-            if update_type == 6:
+            if update_type == 1:
+                _logger.info('Entered update_type equal to 1')
+                self.data = {
+                    'SFID': record.opportunity_id.salesforce_id,
+                    'BillCustomerID': record.customer_number,
+                    'UpdateType': update_type
+                }
+            elif update_type == 5:
+                _logger.info('Entered update_type equal to 5')
+                self.data = {
+                    'SFID': record.opportunity_id.salesforce_id,
+                    'AccountStatus': "Disconnected",
+                    'AccountsubType': "Voluntary/Physical Disconnected",
+                    'UpdateType': update_type
+                }
+            elif update_type == 6:
                 _logger.info('Entered update_type equal to 6')
                 self.data = {
                     'SFID': record.opportunity_id.salesforce_id,
-                    'SMS_Activation_Date_Time': record.date_start.strftime("%m/%d/%Y %I:%M%p"),
+                    'BillCustomerID': record.customer_number,
+                    'SMS_Activation_Date_Time': now.strftime("%m/%d/%Y %I:%M%p"),
                     'SubscriptionCode': record.code,
                     'AccountStatus': "Active",
                     'ProductCode': main_plan.default_code.upper(),
                     'UpdateType': update_type
                 }
             elif update_type == 7:
-                _logger.info('Entered update_type equal to 6')
+                _logger.info('Entered update_type equal to 7')
                 self.data = {
                     'SFID': record.opportunity_id.salesforce_id,
                     'SubscriptionCode': record.code,
@@ -42,6 +63,4 @@ class SalesForceConnector(models.Model):
   
         _logger.info(f'SF Update Account Status: {update_account_stat}')
         return update_account_stat
-
-
 

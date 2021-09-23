@@ -124,12 +124,12 @@ class SalesForceImporterCustomers(models.Model):
             'subscriber_type': '',
             'account_classification': '',
             'account_subclassification': None,
-            'type': '',
+            'type': ''
         }
 
         if zone:
             data['subscriber_location_id'] = zone.id
-            data['company_id'] = zone.company_id.id
+            # data['company_id'] = zone.company_id.id
 
         type_data = partner['Type']
         if type_data:

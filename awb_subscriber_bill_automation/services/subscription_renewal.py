@@ -26,6 +26,7 @@ class SaleSubscription(models.Model):
                                             ('convert', 'Convert'),
                                             ('downgrade', 'Downgrade'),
                                             ('re-contract', 'Re-contract'),
+                                            ('transfer', 'Transfer'),
                                             ('pre-termination', 'Pre-Termination'),
                                             ('disconnection', 'Disconnection'),
                                             ('reconnection', 'Reconnection')], default='new', string="Subscription Status")
