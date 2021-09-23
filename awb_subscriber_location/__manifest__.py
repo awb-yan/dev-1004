@@ -21,7 +21,7 @@
 
     'category': 'Localization',
 
-    'version': '13.0.1.2.0',
+    'version': '13.0.1.3.0',
 
     'depends': ['account_accountant', 'base_address_city', 'contact_record', 'contacts', 'hr', 'mail', 'project', 'sale_management', 'sale_subscription'],
 

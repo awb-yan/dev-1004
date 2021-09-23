@@ -166,6 +166,8 @@ class SalesForceImporterOpportunities(models.Model):
             subscription_status = 're-contract'
         elif subscription_status == 'Downgrade':
             subscription_status = 'downgrade'
+        elif subscription_status == 'Transfer':
+            subscription_status = 'transfer'    
         elif subscription_status == 'Reconnect ion':
             subscription_status = 'reconnection'
         elif subscription_status == 'Convert':
@@ -174,8 +176,6 @@ class SalesForceImporterOpportunities(models.Model):
             subscription_status = 'disconnection'
         elif subscription_status == 'Pre-Termination':
             subscription_status = 'pre-termination'
-        elif subscription_status == 'Transfer':
-            subscription_status = 'transfer'
         else:
             subscription_status = ''
 

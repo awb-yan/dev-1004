@@ -26,6 +26,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "System, Voluntary"},
                 "od": {"name": "Odoo", "value": "disconnection-temporary"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": False,
                 "desc": "Subscriber Request",
                 "function": "_change_status_subtype"
             },
@@ -33,6 +34,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "System, Involuntary"},
                 "od": {"name": "Odoo", "value": "disconnection-temporary"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": True,
                 "desc": "Promo Expiry",
                 "function": "_change_status_subtype"
             },
@@ -40,6 +42,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "System, Involuntary"},
                 "od": {"name": "Odoo", "value": "disconnection-temporary"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": False,
                 "desc": "Bandwidth Usage Exceeded",
                 "function": "_change_status_subtype"
             },
@@ -47,6 +50,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "System, Involuntary"},
                 "od": {"name": "Odoo", "value": "disconnection-temporary"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": False,
                 "desc": "Billing Non-Payment",
                 "function": "_change_status_subtype"
             },
@@ -54,6 +58,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "Physical, Involuntary"},
                 "od": {"name": "Odoo", "value": "disconnection-permanent"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": False,
                 "desc": "Billing Non-Payment",
                 "function": "_change_status_subtype"
             },
@@ -61,6 +66,7 @@ class SubscriptionDisconnect(models.Model):
                 "sf": {"name": "Salesforce", "value": "Physical, Voluntary"},
                 "od": {"name": "Odoo", "value": "disconnection-permanent"},
                 "ar": {"name": "Aradial", "value": ""},
+                "subs_closed": False,
                 "desc": "Subscriber Request",
                 "function": "_change_status_subtype"
             },
@@ -73,13 +79,14 @@ class SubscriptionDisconnect(models.Model):
                 return {
                     "name": value.get("name"),
                     "status": value.get("value"),
+                    "subs_closed": discon_type.get("subs_closed"),
                     "description": discon_type.get("desc"),
                     "executable": discon_type.get("function")
                 }
 
         return False
 
-    def _change_status_subtype(self, records, status, is_closed_subs = False, executed=False):
+    def _change_status_subtype(self, records, status, is_closed_subs = False, executed=False, ctp=False):
         _logger.info('function: _change_status_subtype')
         for record in records:
             if (
@@ -99,5 +106,20 @@ class SubscriptionDisconnect(models.Model):
                         "subscription_status_subtype": status
                     })
                 executed = True
+                if not ctp:
+                    self._send_expirynotification(record)
 
         return executed
+
+    def _send_expirynotification(self, record):
+        try:            
+            _logger.info(f'=== Sending Expiry Notification ===')
+            _logger.debug(f'=== record {record} ===')
+            self.env["awb.sms.send"]._send_subscription_notif(
+                recordset=record,
+                template_name="Subscription Expiry Notification",
+                state="In Progress" 
+            )
+            _logger.debug('Completed Sending Expiry Notification')
+        except:
+            _logger.warning('!!! Error sending Expiry Notification')

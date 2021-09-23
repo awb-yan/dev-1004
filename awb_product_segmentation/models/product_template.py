@@ -25,9 +25,15 @@ class ProductTemplate(models.Model):
 	def onchange_subscription_template(self):
 		for rec in self:
 			if rec.recurring_invoice == True:
-				rec.subscription_template_id = self.env['sale.subscription.template'].search([('name','ilike','month')], limit=1)
+				keyword = 'month' #default for postpaid
+
+				if rec.sf_plan_type.name == 'Prepaid':
+					keyword = rec.default_code
+
+				rec.subscription_template_id = self.env['sale.subscription.template'].search([('name','ilike',keyword)], limit=1)
 			else:
 				rec.subscription_template_id = False
+
 
 
 class CustomProductCategory(models.Model):

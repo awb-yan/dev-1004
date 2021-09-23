@@ -88,7 +88,7 @@ class OdooAPI(OdooAPI):
                     "request.env[SUBSCRIPTION].%s"
                     % function
                 )
-                executed = executable(subscription_records, discon_status.get("status"))
+                executed = executable(subscription_records, discon_status.get("status"), discon_status.get("subs_closed"))
 
             if executed:
                 http.Response.status = "200"

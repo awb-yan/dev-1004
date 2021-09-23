@@ -153,16 +153,19 @@ class SMS(models.Model):
         record_validations = []
         if recordset and send_type != "generic":
             _logger.debug('recordset and type != generic')
+            _logger.debug(f'state: {state}')
             if not state:
                 _logger.debug('not state')
                 raise exceptions.ValidationError(
                     ("State parameter is required, Please check server actions")
                 )
+            #TODO need to change this logic to accommodate records without state ( Subscription )  
             if recordset.filtered(lambda rec: rec.state != state).exists():
                 _logger.debug('No state')
-                raise exceptions.ValidationError(
-                    ("Record should be in %s state.") % state
-                )
+                if template_name != 'Subscription Expiry Notification':
+                    raise exceptions.ValidationError(
+                        ("Record should be in %s state.") % state
+                    )
 
             # Get the raw template and keys for formatting
             raw_template_body, format_keys = self.env['awb.sms.template'].get_template_format(template_name)
