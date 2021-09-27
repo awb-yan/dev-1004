@@ -13,7 +13,7 @@ class ApprovalRequest(models.Model):
     has_manager = fields.Selection(related='category_id.has_manager')
     department_id = fields.Many2one('hr.department', String='Department')
     manager_id = fields.Many2one('hr.employee', String='Manager')
-    can_approve = fields.Boolean(string='Can Approve', compute='_check_can_approve', default=False)
+    can_approve = fields.Boolean(string='Can Approve', default=False, compute='_check_can_approve')
 
     @api.onchange('request_owner_id')
     def _onchange_request_owner(self):
@@ -125,7 +125,9 @@ class ApprovalRequest(models.Model):
             self.sudo().update({'approver_ids': [(5,0,0)]})
             self.sudo().update({'approver_ids': data_approvers})
 
-            for sequence in range(len(self.approver_ids)):
+            for sequence in range(1,len(self.approver_ids)+1):
+                _logger.debug(f'Sequence: {sequence}')
+                _logger.debug(f'Length: {len(self.approver_ids)}')
                 seq_approver = self.mapped('approver_ids').filtered(lambda seq: seq.sequence == sequence)
                 if all(line.sequence == 1 for line in seq_approver):
                     seq_approver.write({'can_approve': True})

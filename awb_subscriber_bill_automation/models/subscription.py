@@ -46,7 +46,7 @@ class SaleSubscription(models.Model):
 
     # New Fields
 
-    plan_type = fields.Many2one('product.plan.type', compute='_compute_plan_type')
+    plan_type = fields.Many2one('product.plan.type', compute='_compute_plan_type', store=True)
 
     # Business Logic
 
@@ -75,6 +75,7 @@ class SaleSubscription(models.Model):
         plan_type = ''
         max_fail_retries = 3
         ctp = False
+        last_subs_main_plan = False
 
         try:
             main_plan = self._get_mainplan(self.record)        
@@ -95,6 +96,7 @@ class SaleSubscription(models.Model):
             # CTP flow for prepaid, 
             if last_subscription:
                 ctp = True   
+                last_subs_main_plan = self._get_mainplan(last_subscription)        
                 
                 self.record = self._update_new_subscription(self.record, last_subscription)
                 # self.record.opportunity_id = last_subscription.opportunity_id
@@ -103,11 +105,11 @@ class SaleSubscription(models.Model):
                 try:
                     is_closed_subs = True
                     subtype = "disconnection-temporary"
-                    self.env['sale.subscription']._change_status_subtype(last_subscription, subtype, is_closed_subs, ctp)
+                    self.env['sale.subscription']._change_status_subtype(last_subscription, subtype, is_closed_subs, ctp=ctp)
                 except:
                     _logger.error(f'SMS:: !!! Failed Temporary Discon - Subscription code {self.record.code}')
 
-            self.env['sale.subscription'].provision_and_activation(self.record, main_plan, last_subscription, ctp)
+            self.env['sale.subscription'].provision_and_activation(self.record, main_plan, last_subscription, last_subs_main_plan, ctp)
 
             # Helper to update Odoo Opportunity
             try:

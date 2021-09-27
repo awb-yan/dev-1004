@@ -209,7 +209,7 @@ class SalesForceImporterOpportunities(models.Model):
         zone = self._find_zone(lead['Area_ODOO__c'])
 
         contract_term = lead.get('Contract_Term__c', 0)
-        if contract_term:
+        if contract_term or contract_term >= 0:
             contract_term = int(contract_term)
 
         # Business Unit
@@ -226,10 +226,10 @@ class SalesForceImporterOpportunities(models.Model):
         contract_end_date = None
         if job_orders:
             for jo in job_orders.get('records', []):
-                contract_start_date = jo.get('SLA_Activation_Actual_End_Date__c', None)
+                contract_start_date = jo.get('SLA_Activation_Actual_End_Date__c', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
                 sms_user_id = jo.get('SMS_User_ID__c', None)
                 sms_password = jo.get('SMS_Password__c', None)
-                if contract_start_date and contract_term:
+                if contract_start_date and (contract_term or contract_term >= 0):
                     if isinstance(contract_start_date, int):
                         contract_start_date = datetime.datetime.fromtimestamp(contract_start_date/1000)
                     else:

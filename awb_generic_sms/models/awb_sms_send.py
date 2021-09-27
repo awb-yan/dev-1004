@@ -211,7 +211,7 @@ class SMS(models.Model):
                     except AttributeError:
                         value = None
 
-                    if value:
+                    if value or value == 0:
                         try:
                             if value.name:
                                 _logger.debug(f'value.name: {value.name}')

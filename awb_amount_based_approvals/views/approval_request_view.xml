@@ -25,13 +25,20 @@
             </xpath>
 
             <xpath expr="//button[@name='action_approve']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|','|',('user_status','!=','pending'),('can_approve','=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('can_approve','=', False), ('user_status','!=','pending')]}</attribute>
             </xpath>
             <xpath expr="//button[@name='action_refuse']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|','|',('user_status','!=','pending'),('can_approve','=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('can_approve','=', False),('user_status','!=','pending')]}</attribute>
             </xpath>
             <xpath expr="//button[@name='action_cancel']" position="attributes">
-                <attribute name="attrs">{'invisible':['|','|',('request_status','in',['new','cancel']),('can_approve','=', False),'&amp;',('user_status','==',False),('has_access_to_request','==',False)]}</attribute>
+                <attribute name="attrs">{'invisible':['|','|',('request_status','in',['new','cancel']),('can_approve','=',False),'&amp;',('user_status','==',False),('has_access_to_request','==',False)]}</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_cancel']" position="before">
+            <button name="action_cancel" 
+                    string="Cancel Request" 
+                    type="object" 
+                    attrs="{'invisible':['|',('user_status','!=', False),('request_status','in',['new','cancel'])]}"/>
             </xpath>
 
             <xpath expr="//page[@name='approvers']/field[@name='approver_ids']/tree/field[@name='user_id']" position="before">
@@ -49,10 +56,10 @@
                 <field name="can_approve" invisible="1"/>
             </xpath>
             <xpath expr="//a[@name='action_approve']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|','|',('user_status','!=','pending'),('can_approve','=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('can_approve','=', False), ('user_status','!=','pending')]}</attribute>
             </xpath>
             <xpath expr="//a[@name='action_refuse']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|','|',('user_status','!=','pending'),('can_approve','=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('can_approve','=', False), ('user_status','!=','pending')]}</attribute>
             </xpath>
         </field>
     </record>

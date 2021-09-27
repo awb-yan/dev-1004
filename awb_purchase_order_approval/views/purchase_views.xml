@@ -45,7 +45,7 @@
       <field name="name">view.purchase.order.approval.form.admin</field>
       <field name="model">purchase.order</field>
       <field name="inherit_id" ref="view_purchase_order_approval_form"/>
-      <field name="groups_id" eval="[(6, 0, [ref('base.group_erp_manager')])]"/>
+      <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
       <field name="arch" type="xml">
           <xpath expr="//button[@id='bid_confirm']" position="attributes">
             <attribute name="invisible">0</attribute>
