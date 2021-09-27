@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="sale_subscription_form_view_inherit" model="ir.ui.view">
+        <field name="name">sale.subscription.form.view.inherit</field>
+        <field name="model">sale.subscription</field>
+        <field name="inherit_id" ref="sale_subscription.sale_subscription_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='date_start']" position="before">
+                <field name="plan_name" invisible="1"/>
+                <field name="start_datetime" string="Start" attrs="{'invisible': [('plan_name','=','Postpaid')]}"/>
+                <field name="end_datetime" string="End" attrs="{'invisible': [('plan_name','=','Postpaid')]}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="attrs">{'invisible': [('plan_name','=','Prepaid')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="attrs">{'invisible':[('plan_name','=','Prepaid')]}</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
