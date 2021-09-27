@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="customer_portal_subscription_inherit" inherit_id="sale_subscription.subscription">
+
+    <xpath expr="//ul[@class='list-group list-group-flush flex-wrap flex-row flex-lg-column']/li/div[1]" position="replace">
+        <!-- Sidebar View -->
+      <div t-if="account.plan_type.name == 'Postpaid'">
+        <strong>Next Invoice: <span t-field="account.recurring_next_date"/></strong>
+      </div> 
+      <div t-if="account.end_datetime and account.plan_type.name == 'Prepaid'">
+        <strong>Valid Until: <span t-field="account.end_datetime" t-options="{'widget': 'date'}"/> </strong>
+      </div>
+    </xpath>
+
+    <xpath expr="//table[@class='table table-borderless table-sm']" position="replace">
+      <!-- Plan Overview -->
+      <table class="table table-borderless table-sm">
+          <tbody style="white-space:nowrap">
+              <tr>
+                  <th class="text-right pb-0">Current Plan:</th>
+                  <th class="w-100 pb-0 text-wrap"><span t-field="template.name"/></th>
+              </tr>
+              <tr>
+                  <th class="text-right">Reference:</th>
+                  <td class="w-100"><span t-field="account.code"/></td>
+              </tr>
+              <tr t-if="account.date and account.plan_type.name == 'Postpaid'">
+                  <th class="text-right pb-0">Valid Until:</th>
+                  <td class="w-100 pb-0"><span t-field="account.date"/></td>
+              </tr>
+              <tr t-if="account.end_datetime and account.plan_type.name == 'Prepaid'">
+                  <th class="text-right pb-0">Valid Until:</th>
+                  <td class="w-100 pb-0"><span t-field="account.end_datetime" t-options="{'widget': 'date'}"/></td>
+              </tr>
+              <tr t-if="account.plan_type.name == 'Postpaid'">
+                  <th class="text-right pb-0">Start Date:</th>
+                  <td class="w-100 pb-0"><span t-field="account.date_start"/></td>
+              </tr>
+              <tr t-if="account.plan_type.name == 'Postpaid'">
+                  <th class="text-right pb-0">Next Invoice:</th>
+                  <td class="w-100 pb-0"><span t-field="account.recurring_next_date"/></td>
+              </tr>
+              <tr t-if="account.plan_type.name == 'Prepaid'">
+                  <th class="text-right pb-0">Start:</th>
+                  <td class="w-100 pb-0"><span t-field="account.start_datetime"/></td>
+              </tr>
+              <tr t-if="account.plan_type.name == 'Prepaid'">
+                  <th class="text-right pb-0">End:</th>
+                  <td class="w-100 pb-0"><span t-field="account.end_datetime"/></td>
+              </tr>
+          </tbody>
+      </table>
+      
+    </xpath>
+
+  </template>
+
+</odoo>
