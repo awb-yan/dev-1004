@@ -9,7 +9,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-# import pytz
+from  pytz import timezone
 
 import json
 
@@ -110,7 +110,10 @@ class SaleSubscription(models.Model):
             self.env['sale.subscription'].provision_and_activation(self.record, main_plan, last_subscription, ctp)
 
             # Helper to update Odoo Opportunity
-            self._update_account(main_plan, self.record, sf_update_type, max_fail_retries)            
+            try:
+                self._update_account(main_plan, self.record, sf_update_type, max_fail_retries)
+            except:
+                _logger.error(f'SMS:: !!! Failed SF Account Update - Subscription code {self.record.code}')            
 
         if not ctp:
             self.env['sale.subscription'].generate_atmref(self.record, max_fail_retries)
@@ -502,10 +505,12 @@ class SaleSubscription(models.Model):
     def _get_datetime_now(self):
         _logger.info(f'SMS:: function: _get_datetime_now')    
         try:
-            # timezone = self.env.user.tz or pytz.utc
-            # now = datetime.datetime.now(pytz.timezone(timezone))
+            # Current time in UTC
+            now_utc = datetime.now(timezone('UTC'))
+            # Convert to Asia/Manila time zone
+            now = now_utc.astimezone(timezone('Asia/Manila'))
             for rec in self:
-                rec.datetime_now = datetime.now().strftime("%m/%d/%Y %I:%M %p")
+                rec.datetime_now = now.strftime("%m/%d/%Y %I:%M %p")
                 _logger.debug(f'SMS::rec.datetime_now {rec.datetime_now}')
         except:
             _logger.error(f'SMS:: Error encountered in getting date and time..') 

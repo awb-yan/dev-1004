@@ -1,7 +1,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-import datetime
-# import pytz
+from datetime import datetime
+from pytz import timezone
 
 
 import logging
@@ -13,9 +13,12 @@ class SalesForceConnector(models.Model):
 
     def update_account(self, record=None, update_type=None, main_plan=None):
         _logger.info('function: SalesForceConnector => update_account')
-
-        now = datetime.now() + datetime.timedelta(hours=8)
         
+        # Current time in UTC
+        now_utc = datetime.now(timezone('UTC'))
+        # Convert to Asia/Manila time zone
+        now = now_utc.astimezone(timezone('Asia/Manila'))
+
         if record:
             self.data = {}
             if update_type == 1:
