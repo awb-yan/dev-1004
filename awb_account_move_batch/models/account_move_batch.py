@@ -106,18 +106,19 @@ class AccountMoveBatch(models.Model):
             for sub_line in sub.recurring_invoice_line_ids:
                 if sub_line.product_id.id != device_id:
                     if sub_line.product_id.product_tmpl_id.product_segmentation != 'device':
-                        data = {
-                            'date': self.rebate_date,
-                            'subscription_line_id': sub_line.id,
-                            'partner_id': partner.id,
-                            'product_id': sub_line.product_id.id,
-                            'company_id': sub_line.company_id.id,
-                            'description': sub_line.name,
-                            'uom_id': sub_line.uom_id.id,
-                            'amount': 0
-                        }
+                        if sub_line.product_id.product_tmpl_id.sf_plan_type.name != 'Prepaid':
+                            data = {
+                                'date': self.rebate_date,
+                                'subscription_line_id': sub_line.id,
+                                'partner_id': partner.id,
+                                'product_id': sub_line.product_id.id,
+                                'company_id': sub_line.company_id.id,
+                                'description': sub_line.name,
+                                'uom_id': sub_line.uom_id.id,
+                                'amount': 0
+                            }
 
-                        sub_product.append((0, 0, data))
+                            sub_product.append((0, 0, data))
         self.update({'invoice_ids': None})
         self.update({'invoice_ids': sub_product})
         

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [13.0.1.8.0] - 2021-09-24
+
+    - [FIX] update group view
 ## [13.0.1.7.2] - 2021-09-02
 
     - [IMP] Added group view for Administrator access.

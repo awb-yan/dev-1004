@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 class SubscriptionCreate(models.Model):
     _inherit = "sale.subscription"
 
-    def provision_and_activation(self, record, main_plan, last_subscription, ctp):
+    def provision_and_activation(self, record, main_plan, last_subscription, last_subs_main_plan, ctp):
         _logger.info('SMS:: function: provision_and_activation')
 
         max_retries = 3
@@ -33,13 +33,13 @@ class SubscriptionCreate(models.Model):
 
         # Plan Type Flow routing
         if plan_type == 'Postpaid':
-            self._provision_postpaid(record, last_subscription)
+            self._provision_postpaid(record, ctp)
         else:
-            self._provision_prepaid(record, last_subscription)
+            self._provision_prepaid(record, ctp)
 
         # Facility Type routing
         if aradial_flag:
-            self._send_to_aradial(record, main_plan, max_retries, last_subscription)
+            self._send_to_aradial(record, main_plan, max_retries, last_subscription, last_subs_main_plan, plan_type, ctp)
 
         self._start_subscription(record, max_retries, ctp)
 
@@ -54,8 +54,8 @@ class SubscriptionCreate(models.Model):
 
 
     # TODO: update Postpaid provisioning
-    def _provision_postpaid(self, record, last_subscription):
-        if not last_subscription:
+    def _provision_postpaid(self, record, ctp):
+        if not ctp:
             _logger.debug('SMS:: first')
             # Welcome Provisioning Notification
         else:
@@ -64,10 +64,10 @@ class SubscriptionCreate(models.Model):
 
         return 0
 
-    def _provision_prepaid(self, record, last_subscription):
+    def _provision_prepaid(self, record, ctp):
         _logger.info('SMS:: function: provision_prepaid')
         
-        if not last_subscription:
+        if not ctp:
             _logger.debug('SMS:: First subscription')
             try:
                 _logger.info(' === Sending SMS Welcome Notification ===')
@@ -84,10 +84,11 @@ class SubscriptionCreate(models.Model):
             _logger.debug('SMS:: Reloading...')
 
 
-    def _send_to_aradial(self, record, main_plan, max_retries, last_subscription):
+    def _send_to_aradial(self, record, main_plan, max_retries, last_subscription, last_subs_main_plan, plan_type, ctp):
         _logger.info('SMS:: function: send_to_aradial')
         # New Subscription
-        if not last_subscription:
+        if not ctp:
+            _logger.debug('SMS:: CTP: New Subscriber')
             try:
                 # for Residential
                 first_name = record.partner_id.first_name
@@ -105,15 +106,14 @@ class SubscriptionCreate(models.Model):
                     'CustomInfo2': record.subscriber_location_id.name,
                     'CustomInfo3': record.customer_number,
                     'Offer': main_plan.default_code.upper(),
-                    # 'StartDate': record.date_start.strftime("%m/%d/%Y, %H:%M:%S"),
                     'Status': '0',
                     'FirstName': first_name,
                     'LastName': last_name,
                     'ServiceType': 'Internet',
-                    'PrepaidIndicator': 1 if main_plan.sf_plan_type.name == 'Prepaid' else 0,
+                    'PrepaidIndicator': 1 if plan_type == 'Prepaid' else 0,
                 }
 
-                _logger.debug(f'SMS:: Creating User with data: {self.data}')
+                _logger.info(f'SMS:: Creating User with data: {self.data}')
 
                 if not self.env['aradial.connector'].create_user(self.data):
                     raise Exception
@@ -122,17 +122,14 @@ class SubscriptionCreate(models.Model):
 
             except:
                 if max_retries > 1:
-                    self._send_to_aradial(record, main_plan, max_retries-1, last_subscription)
+                    self._send_to_aradial(record, main_plan, max_retries-1, last_subscription, last_subs_main_plan, plan_type, ctp)
                 else:
                     _logger.error(f'SMS:: !!! Add to Failed transaction log - Subscription code {record.code}')
                     raise Exception(f'SMS:: !!! Error Creating user in Aradial for {record.code}')
 
-        else:   # CTP - Update User's TimeBank
-            # 2 options to handle this:
-            #     1. Update the Offer of the User in Aradial (does it add up the remaining timebank?)
-            #     2. Get the remaining time and delete the user in Aradial, create new user with the additional_time
+        else:   # CTP
             _logger.info(f'SMS:: Processing reloading for Customer: {record.code}, New Subscription: {record.code} and New Offer: {main_plan.default_code.upper()}')
-    
+
             # for Residential
             first_name = record.partner_id.first_name
             last_name = record.partner_id.last_name
@@ -144,10 +141,9 @@ class SubscriptionCreate(models.Model):
 
             self.data = {
                 'UserID': record.opportunity_id.jo_sms_id_username,
-                'Password': record.opportunity_id.jo_sms_id_password,
-                'Status': '0',
                 'Offer': main_plan.default_code.upper(),
-                'Timebank': self._getTimebank(main_plan.default_code.upper()),
+                'Status': '0',
+                'TimeBank': self._getTimebank(main_plan.default_code.upper()),
                 'CustomInfo1': record.code,
                 'CustomInfo2': record.subscriber_location_id.name,
                 'CustomInfo3': record.customer_number,
@@ -158,14 +154,20 @@ class SubscriptionCreate(models.Model):
             _logger.info(f'SMS:: Updating aradial user with data= {self.data}')
 
             try:
-                if not self.env['aradial.connector'].update_user(self.data):
-                    raise Exception
+                if last_subs_main_plan.default_code.upper() != main_plan.default_code.upper():
+                    _logger.debug('SMS:: CTP: Different Product')
+                    if not self.env['aradial.connector'].update_user(self.data, 1):
+                        raise Exception
+                else:
+                    _logger.debug('SMS:: CTP: Same Product')
+                    if not self.env['aradial.connector'].update_user(self.data, 2, record.opportunity_id.jo_sms_id_username):
+                        raise Exception
             except:
                 if max_retries > 1:
-                    self._send_to_aradial(record, main_plan, max_retries-1, last_subscription)
+                    self._send_to_aradial(record, main_plan, max_retries-1, last_subscription, last_subs_main_plan, plan_type, ctp)
                 else:
-                    _logger.error(f'SMS:: !!! Error encountered while updating aradial user for Subscription: {record.code} and SMS UserID: {record.opportunity_id.jo_sms_id_username}')
-                    raise Exception(f'SMS:: !!! Error encountered while updating aradial user for Subscription: {record.code} and SMS UserID: {record.opportunity_id.jo_sms_id_username}')
+                    _logger.error(f'SMS:: !!! Error encountered while updating the Timebank of aradial user for Subscription: {record.code} and SMS UserID: {record.opportunity_id.jo_sms_id_username}')
+                    raise Exception(f'SMS:: !!! Error encountered while updating the Timebank of aradial user for Subscription: {record.code} and SMS UserID: {record.opportunity_id.jo_sms_id_username}')
 
 
     def _start_subscription(self, record, max_retries, ctp):
@@ -229,15 +231,10 @@ class SubscriptionCreate(models.Model):
                 _logger.error(f'SMS:: !!! Error encountered while generating atm reference for subscription {self.record.code}..')
                 raise Exception(f'SMS:: !!! Error encountered while generating atm reference for subscription {self.record.code}..')
 
+
     def _getTimebank(self, offer):
 
-        if offer == 'PREPAIDFBR5DAYS':
-            return 5 * 86400
-        elif offer == 'PREPAIDFBR10DAYS':
-            return 10 * 86400
-        elif offer == 'PREPAIDFBR15DAYS':
-            return 15 * 86400
-        elif offer == 'PREPAIDFBR30DAYS':
-            return 30 * 86400
-        
-        return 0
+        params = self.env['ir.config_parameter'].sudo()
+        days = params.get_param(offer)
+
+        return int(days) * 86400

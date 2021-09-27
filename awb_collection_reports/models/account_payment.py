@@ -26,6 +26,10 @@ class AccountPayment(models.Model):
                     if due_date:
                         if due_date >= record.payment_date:
                             amount += invoice.paid_amount
+                        else:
+                            amount = 0
+                    else:
+                        amount = 0
                 record.current = amount
 
             if not record.invoice_line:
@@ -42,6 +46,8 @@ class AccountPayment(models.Model):
                                 amount = invoice.amount_total
                             elif invoice.amount_total > record.amount:
                                 amount = record.amount
+                            else:
+                                amount = 0
                     else:
                         pay_term = invoice.invoice_payment_term_id.line_ids
                         term_day = 0
@@ -59,6 +65,8 @@ class AccountPayment(models.Model):
                                     amount = invoice.amount_total
                                 elif invoice.amount_total > record.amount:
                                     amount = record.amount
+                                else:
+                                    amount = 0
                 record.current = amount
 
     @api.depends('reconciled_invoice_ids','invoice_line','amount')
@@ -73,6 +81,8 @@ class AccountPayment(models.Model):
                     if due_date:
                         if due_date < record.payment_date:
                             amount += invoice.paid_amount
+                        else:
+                            amount = 0
                 record.arrears = amount
                         
             if not record.invoice_line:
@@ -89,6 +99,8 @@ class AccountPayment(models.Model):
                                 amount = invoice.amount_total
                             elif invoice.amount_total > record.amount:
                                 amount = record.amount
+                            else:
+                                amount = 0
                     else:
                         pay_term = invoice.invoice_payment_term_id.line_ids
                         term_day = 0
@@ -106,6 +118,8 @@ class AccountPayment(models.Model):
                                     amount = invoice.amount_total
                                 elif invoice.amount_total > record.amount:
                                     amount = record.amount
+                                else:
+                                    amount = 0
                 record.arrears = amount
 
     @api.depends('current','arrears','amount')
@@ -114,3 +128,5 @@ class AccountPayment(models.Model):
             amount_due = record.arrears + record.current
             if amount_due > 0 and record.amount > amount_due:
                 record.advances = record.amount - amount_due
+            else:
+                record.advances = 0

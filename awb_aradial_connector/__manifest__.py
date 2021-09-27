@@ -15,7 +15,7 @@
     'author': "Achieve Without Borders, Inc",
     'website': "http://www.achievewithoutborders.com",
     'category': 'Sales',
-    'version': '13.0.1.0.2',
+    'version': '13.0.1.0.3',
     'depends': ['base', 'crm', 'sale_management', 'sale_subscription', 'awb_subscriber_product_information'],
     'data': [
         

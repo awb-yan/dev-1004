@@ -1,5 +1,9 @@
 Format in CHANGELOG.md
 
+## [13.0.1.4.4] - 2021-09-22
+
+- [IMP] Plan type exclusion on computation
+
 ## [13.0.1.3.4] - 2021-09-08
 
 - [FIX] Rebate form

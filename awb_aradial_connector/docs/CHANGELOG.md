@@ -1,5 +1,8 @@
 # Changelog
 
+## [13.0.1.0.3] - 2021-09-27
+- [ADD] Handling for same-product reloading and Get User's return value
+
 ## [13.0.1.0.2] - 2021-09-22
 - [FIX] Removed update to Timebank
 

@@ -14,7 +14,7 @@
     'author': "Achieve Without Borders, Inc",
     'website': "http://www.achievewithoutborders.com",
     'category': 'Accounting/Accounting',
-    'version': '13.0.1.3.4',
+    'version': '13.0.1.4.4',
     'depends': ['account', 'awb_subscriber_location'],
     'data': [
         'data/account_move_rebate_sequence.xml',

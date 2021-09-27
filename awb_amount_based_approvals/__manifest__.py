@@ -21,7 +21,7 @@
 
     'category': 'Approvals',
 
-    'version': '13.0.1.2.4',
+    'version': '13.0.1.2.5',
 
     'depends': ['approvals', 'requisition_approval'],
 

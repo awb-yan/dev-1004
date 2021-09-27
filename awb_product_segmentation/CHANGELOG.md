@@ -1,3 +1,6 @@
+## [13.0.1.4.3] - 2021-09-27
+- [FIX] Move Facility Type 
+
 ## [13.0.1.4.2] - 2021-09-22
 - [ADD] Subscription Template Update for Prepaid
 
