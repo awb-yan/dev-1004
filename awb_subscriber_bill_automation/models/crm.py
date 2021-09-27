@@ -79,9 +79,13 @@ class CRMLead(models.Model):
                 lines.append((0, 0, data))
                 _logger.debug(f'Get Lines {lines}')
 
-                sale_order_id = self.sudo().env['sale.order'].create(data)
-                sale_order_id.action_confirm()
-                _logger.debug(f'Sale Order {sale_order_id}')
+                try: 
+                    sale_order_id = self.sudo().env['sale.order'].create(data)
+                    sale_order_id.action_confirm()
+
+                    _logger.debug(f'Sale Order Created: {sale_order_id}')
+                except Exception as e:
+                    _logger.error(f'SMS:: SO CREATION:: Error encountered in creation and confirming Sales Order... Err: {str(e)}')         
 
             elif self.subscription_status == 'disconnection' or self.subscription_status == 'pre-termination':
                 subscriber_id = self.sudo().env['sale.subscription'].search([('partner_id', '=', self.partner_id.id), (
@@ -148,11 +152,11 @@ class CRMLead(models.Model):
 
         domain = [('stage_id', 'in', [closed_lost.id, closed_won.id])]
         oppys = self.env['crm.lead'].search(domain, limit=200)
-        _logger.debug(f'Oppys to complete: {len(oppys)}')
+        _logger.debug(f'Opportunities to complete: {len(oppys)}')
         for oppy in oppys:
-            _logger.debug(f'Processing Oppy: {oppy}')
+            _logger.debug(f'Processing Opportunity: {oppy}')
             try:
                 oppy.stage_id = completed.id
                 self.env.cr.commit()
             except Exception as e:
-                _logger.info(f'Cannot complete oppy: {oppy} Err: {str(e)}')
+                _logger.error(f'Cannot complete opportunity: {oppy} Err: {str(e)}')

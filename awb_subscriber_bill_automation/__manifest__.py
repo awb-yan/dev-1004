@@ -33,6 +33,7 @@
         'views/crm_view.xml',
         'views/sale_view.xml',
         'views/subscription_view.xml',
+        'views/website_salecart_lines.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
