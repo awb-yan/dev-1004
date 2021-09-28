@@ -349,6 +349,8 @@ class SalesForceImporterOpportunities(models.Model):
 
     def _get_partner_data(self, lead, customer_sf_ids):
         _logger.info('-------------------- STREAMTECH _get_partner_data start')
+        max_fail_retries = 3
+        sf_update_type = 1
         lead_partner = self.env['res.partner'].search([('salesforce_id', '=', lead['AccountId'])])
         # Added handling of multiple searched leads
         if len(lead_partner) > 1:
@@ -357,6 +359,17 @@ class SalesForceImporterOpportunities(models.Model):
         partner = lead['Account']
         zone = self._find_zone(lead['Area_ODOO__c'])
         lead_partner = self._create_customer(partner, lead_partner, zone, customer_sf_ids)
+
+        # SF API: Account Update
+        try:
+            sf_data = {
+                'SFID': lead['Id'],
+                'BillCustomerID': lead_partner.customer_number,
+                'UpdateType': sf_update_type
+            }
+            self._update_account(sf_data, max_fail_retries)
+        except:
+            _logger.error(f'SF CONNECTOR:: !!! Failed SF Account Update - Opportunity SF Id {lead["Id"]}')
 
         _logger.info('-------------------- STREAMTECH _get_partner_data end')
         return lead_partner
@@ -507,3 +520,14 @@ class SalesForceImporterOpportunities(models.Model):
 
         _logger.info('-------------------- STREAMTECH creating_opportunities end')
         return salesforce_ids
+    
+    def _update_account(self, sf_data, max_retries):
+        _logger.debug(f'SF CONNECTOR:: _update_account')
+        try:
+            self.env['salesforce.connector'].update_account(sf_data)
+        except:
+            if max_retries > 1:
+                self._update_account(sf_data, max_retries-1)
+            else:
+                _logger.error(f'SF CONNECTOR:: !!! Failed SF Update Account from creation of Opportunities')
+                raise Exception(f'!!! Failed SF Update Account from creation of Opportunities') 
