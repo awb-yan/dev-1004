@@ -12,13 +12,13 @@ class SaleSubscription(models.Model):
 
     plan_name = fields.Char(related='plan_type.name')
 
-    start_datetime = fields.Datetime(string="Start Datetime", compute="_get_start_end_datetime")
+    start_datetime = fields.Datetime(string="Start Datetime")
     end_datetime = fields.Datetime(string="End Datetime")
 
-    @api.depends('stage_id')
+    @api.onchange('stage_id')
     def _get_start_end_datetime(self):
         for rec in self:
-            if not rec.start_datetime and rec.stage_id.name == 'In Progress':
+            if rec.stage_id.name == 'In Progress':
                 if rec.plan_type.name == 'Prepaid':
                     rec.start_datetime = fields.Datetime.now()
                     if rec.recurring_rule_boundary == 'limited':
