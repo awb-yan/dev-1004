@@ -12,8 +12,8 @@ class SaleSubscription(models.Model):
 
     plan_name = fields.Char(related='plan_type.name')
 
-    start_datetime = fields.Datetime(string="Start Datetime")
-    end_datetime = fields.Datetime(string="End Datetime")
+    start_datetime = fields.Datetime(string="Start Datetime", store=True)
+    end_datetime = fields.Datetime(string="End Datetime", store=True)
 
     @api.onchange('stage_id')
     def _get_start_end_datetime(self):
