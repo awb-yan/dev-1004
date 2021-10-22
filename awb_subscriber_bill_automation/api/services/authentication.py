@@ -77,7 +77,7 @@ class OdooAPI(OdooAPI):
 
     def _no_permission(self):
         if not request.session.get("login") and not request.session.get("session_token"):
-            http.Response.status = "403"
+            # http.Response.status = "403"
             res = {
                 "errors": {
                     "status": 403,
