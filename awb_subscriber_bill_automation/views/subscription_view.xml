@@ -45,7 +45,7 @@
                 <field name="amount_due" attrs="{'invisible': 0}"/>
                     <!-- <attribute name="groups">sale_subscription.group_sale_subscription_manager,account.group_account_invoice</attribute>
                 </field> -->
-
+            </xpath>
         </field>
     </record>
 
