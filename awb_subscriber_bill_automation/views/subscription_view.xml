@@ -43,7 +43,7 @@
         <field name="groups_id" eval="[(4, ref('account.group_account_invoice')),(4, ref('sale_subscription.group_sale_subscription_manager'))]"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='opportunity_id']" position="after">
-                <field name="amount_due"/>
+                <field name="amount_due" invisible="0"/>
             </xpath>
         </field>
     </record>
