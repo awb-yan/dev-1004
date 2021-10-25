@@ -40,7 +40,7 @@
         <field name="name">view.sale.subscription.amnt.due</field>
         <field name="model">sale.subscription</field>
         <field name="inherit_id" ref="awb_subscriber_bill_automation.view_sale_subscription_form"/>
-        <field name="groups_id" eval="(4, [ref('account.group_account_invoice'),ref('sale_subscription.group_sale_subscription_manager')])"/>
+        <field name="groups_id" eval="(4, ref('sale_subscription.group_sale_subscription_manager'))"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='opportunity_id']" position="after">
                 <field name="amount_due" attrs="{'invisible': 0}"/>
