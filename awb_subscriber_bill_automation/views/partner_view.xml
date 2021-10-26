@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_form_inherit" model="ir.ui.view">
+        <field name="name">view.res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="awb_subscriber_product_information.view_res_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='subscription']" position="inside">
+                <group attrs="{'invisible': [('plan_type','!=', 1)]}">
+                    <group string="Expiration">
+                        <field name="last_reload_date" attrs="{'readonly': 1}"/>
+                        <field name="expiry_date" attrs="{'readonly': 1}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -41,7 +41,7 @@ class OdooAPI(OdooAPI):
         )
 
         if not source:
-            # http.Response.status = "400"
+            http.Response.status = "400"
             res = {
                 "errors": {
                     "status": 400,
@@ -91,12 +91,12 @@ class OdooAPI(OdooAPI):
                 executed = executable(subscription_records, discon_status.get("status"), discon_status.get("subs_closed"))
 
             if executed:
-                # http.Response.status = "200"
+                http.Response.status = "200"
                 status = 200
                 message = "200 OK"
                 code = 200
             else:
-                # http.Response.status = "201"
+                http.Response.status = "201"
                 status = 201
                 message = "201 OK"
                 code = 201
@@ -123,7 +123,7 @@ class OdooAPI(OdooAPI):
             _logger.info(f"----- Disconnection: <Response [{http.Response.status}]> -----")
             return res
 
-        # http.Response.status = "400"
+        http.Response.status = "400"
         res = {
             "errors": {
                 "status": 400,
@@ -149,7 +149,7 @@ class OdooAPI(OdooAPI):
             missing_params += '<subscriptions: dictionary e.g. {code: SUB001, smsid: username}>'
 
         if missing_params:
-            # http.Response.status = "400"
+            http.Response.status = "400"
             res = {
                 "errors": {
                     "status": 400,
