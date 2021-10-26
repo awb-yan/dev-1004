@@ -16,7 +16,7 @@
 
             <xpath expr="//field[@name='code']" position="after">
                 <field name="opportunity_id" readonly="1"/>
-                <!-- <field name="amount_due" groups="account.group_account_invoice" attrs="{'invisible': 0}"/> -->
+                <field name="amount_due" groups="account.group_account_invoice, sale_subscription.group_sale_subscription_manager"/>
                 <field name="atm_ref"/>
                 <field name="atm_ref_sequence"/>
             </xpath>
@@ -36,7 +36,7 @@
         </field>
     </record>
 
-     <record id="view_sale_subscription_amnt_due" model="ir.ui.view">
+     <!-- <record id="view_sale_subscription_amnt_due" model="ir.ui.view">
         <field name="name">view.sale.subscription.amnt.due</field>
         <field name="model">sale.subscription</field>
         <field name="inherit_id" ref="awb_subscriber_bill_automation.view_sale_subscription_form"/>
@@ -46,6 +46,6 @@
                 <field name="amount_due" invisible="1"/>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
 </odoo>
