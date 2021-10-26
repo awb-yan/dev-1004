@@ -20,9 +20,9 @@ _logger = logging.getLogger(__name__)
 class SubscriberRecord(models.Model):
     _inherit = 'res.partner'
 
-    last_reload_date = fields.Date(string="Last Reload Date")
-    last_end_date = fields.Date(string="End date of the Last Reload")
-    expiry_date = fields.Date(string="Last Expiry Date")
+    last_reload_date = fields.Date(string="Last Reload Date", store=True)
+    last_end_date = fields.Date(string="End date of the Last Reload", store=True)
+    expiry_date = fields.Date(string="Last Expiry Date", store=True)
 
 
 class SaleSubscription(models.Model):
