@@ -10,3 +10,4 @@ from . import sale
 from . import subscription_template
 from . import subscription
 from . import partner
+from . import models

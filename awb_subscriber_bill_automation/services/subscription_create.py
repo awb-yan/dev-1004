@@ -143,7 +143,7 @@ class SubscriptionCreate(models.Model):
                 'UserID': record.opportunity_id.jo_sms_id_username,
                 'Offer': main_plan.default_code.upper(),
                 'Status': '0',
-                'TimeBank': self._getTimebank(main_plan.default_code.upper()),
+                'TimeBank': self._getTimebank(record),
                 'CustomInfo1': record.code,
                 'CustomInfo2': record.subscriber_location_id.name,
                 'CustomInfo3': record.customer_number,
@@ -175,10 +175,35 @@ class SubscriptionCreate(models.Model):
         _logger.info('SMS:: function: start_subscription')
 
         try:
+            date_today = fields.Date.today()
             self.record = record
-            now = datetime.now().strftime("%Y-%m-%d")
+            IrConfigParameter = self.env['ir.config_parameter'].sudo()
+            prepaid_days = IrConfigParameter.get_param('prepaid_physical_discon_days')
+
+            last_reload_date = date_today
+
+            contact = self.env['res.partner'].search([("customer_number","=",record.customer_number)])
+            last_end_date = last_reload_date + relativedelta(days=record.template_id.recurring_interval)
+
+            if contact.last_reload_date and contact.last_end_date > date_today:
+                _logger.debug(f'SMS:: Reloading of active subscription for {contact.name}')
+                days_remaining = abs((contact.last_end_date - date_today).days)
+                last_end_date +=  relativedelta(days=days_remaining)
+
+            expiry_date = last_end_date + relativedelta(days=int(prepaid_days))
+
+            _logger.debug(f'last_reload_date: {last_reload_date}')
+            _logger.debug(f'last_end_date: {last_end_date}')
+            _logger.debug(f'expiry_date: {expiry_date}')
+            
+            contact.write({
+                'last_reload_date': last_reload_date,
+                'last_end_date': last_end_date,
+                'expiry_date': expiry_date
+                })
+
             self.record.write({
-                'date_start': now,
+                'date_start': date_today,
                 'stage_id': self.env['sale.subscription.stage'].search([("name", "=", "In Progress")]).id,
                 'in_progress': True
             })
@@ -201,7 +226,7 @@ class SubscriptionCreate(models.Model):
 
         except:
             if max_retries > 1:
-                self._start_subscription(record, max_retries-1)
+                self._start_subscription(record, max_retries-1, ctp)
             else:
                 _logger.error(f'SMS:: !!! Error encountered while starting subscription for {self.record.code}..')
                 raise Exception(f'SMS:: !!! Error encountered while starting subscription for {self.record.code}..')
@@ -232,9 +257,9 @@ class SubscriptionCreate(models.Model):
                 raise Exception(f'SMS:: !!! Error encountered while generating atm reference for subscription {self.record.code}..')
 
 
-    def _getTimebank(self, offer):
+    def _getTimebank(self, rec):
 
-        params = self.env['ir.config_parameter'].sudo()
-        days = params.get_param(offer)
+        _logger.info('SMS:: get_timebank')
 
-        return int(days) * 86400
+        seconds_per_day = 86400
+        return rec.template_id.recurring_interval * seconds_per_day
