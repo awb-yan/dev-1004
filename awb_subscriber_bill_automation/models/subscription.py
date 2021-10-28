@@ -17,12 +17,12 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class SubscriberRecord(models.Model):
-    _inherit = 'res.partner'
+# class SubscriberRecord(models.Model):
+#     _inherit = 'res.partner'
 
-    last_reload_date = fields.Date(string="Last Reload Date", store=True)
-    last_end_date = fields.Date(string="End date of the Last Reload", store=True)
-    expiry_date = fields.Date(string="Last Expiry Date", store=True)
+#     last_reload_date = fields.Date(string="Last Reload Date", store=True)
+#     last_end_date = fields.Date(string="End date of the Last Reload", store=True)
+#     expiry_date = fields.Date(string="Last Expiry Date", store=True)
 
 
 class SaleSubscription(models.Model):
@@ -54,7 +54,7 @@ class SaleSubscription(models.Model):
     # New Fields
 
     plan_type = fields.Many2one('product.plan.type', compute='_compute_plan_type', store=True)
-    amount_due = fields.Float(string="Amount Due", compute='_compute_amount_due', store=True, readonly=True)
+    # amount_due = fields.Float(string="Amount Due", compute='_compute_amount_due', store=True, readonly=True)
 
     # Business Logic
 
@@ -69,19 +69,19 @@ class SaleSubscription(models.Model):
 
             rec.plan_type = plan_type_id
 
-    @api.depends('invoice_count')
-    def _compute_amount_due(self):
-        for rec in self:
-            amnt_due = 0
-            invoices = self.env['account.move'].search([
-                ('customer_number','=',rec.customer_number), 
-                ('state', '=', 'posted'), 
-                ('invoice_payment_state','!=', 'paid')
-            ])
-            for invoice in invoices:
-                amnt_due += invoice.amount_residual_signed
+    # @api.depends('invoice_count')
+    # def _compute_amount_due(self):
+    #     for rec in self:
+    #         amnt_due = 0
+    #         invoices = self.env['account.move'].search([
+    #             ('customer_number','=',rec.customer_number), 
+    #             ('state', '=', 'posted'), 
+    #             ('invoice_payment_state','!=', 'paid')
+    #         ])
+    #         for invoice in invoices:
+    #             amnt_due += invoice.amount_residual_signed
             
-            rec.amount_due = amnt_due
+    #         rec.amount_due = amnt_due
 
 
 

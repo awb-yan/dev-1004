@@ -36,7 +36,7 @@
         </field>
     </record>
 
-     <record id="view_sale_subscription_amnt_due" model="ir.ui.view">
+     <!-- <record id="view_sale_subscription_amnt_due" model="ir.ui.view">
         <field name="name">view.sale.subscription.amnt.due</field>
         <field name="model">sale.subscription</field>
         <field name="inherit_id" ref="awb_subscriber_bill_automation.view_sale_subscription_form"/>
@@ -46,6 +46,6 @@
                 <field name="amount_due" attrs="{'invisible': [('plan_type', '!=', 1)]}"/>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
 </odoo>
