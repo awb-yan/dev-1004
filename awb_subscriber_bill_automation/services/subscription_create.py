@@ -177,30 +177,30 @@ class SubscriptionCreate(models.Model):
         try:
             date_today = fields.Date.today()
             self.record = record
-            # IrConfigParameter = self.env['ir.config_parameter'].sudo()
-            # prepaid_days = IrConfigParameter.get_param('prepaid_physical_discon_days')
+            IrConfigParameter = self.env['ir.config_parameter'].sudo()
+            prepaid_days = IrConfigParameter.get_param('prepaid_physical_discon_days')
 
-            # last_reload_date = date_today
+            last_reload_date = date_today
 
-            # contact = self.env['res.partner'].search([("customer_number","=",record.customer_number)])
-            # last_end_date = last_reload_date + relativedelta(days=record.template_id.recurring_interval)
+            contact = self.env['res.partner'].search([("customer_number","=",record.customer_number)])
+            last_end_date = last_reload_date + relativedelta(days=record.template_id.recurring_interval)
 
-            # if contact.last_reload_date and contact.last_end_date > date_today:
-            #     _logger.debug(f'SMS:: Reloading of active subscription for {contact.name}')
-            #     days_remaining = abs((contact.last_end_date - date_today).days)
-            #     last_end_date +=  relativedelta(days=days_remaining)
+            if contact.last_reload_date and contact.last_end_date > date_today:
+                _logger.debug(f'SMS:: Reloading of active subscription for {contact.name}')
+                days_remaining = abs((contact.last_end_date - date_today).days)
+                last_end_date +=  relativedelta(days=days_remaining)
 
-            # expiry_date = last_end_date + relativedelta(days=int(prepaid_days))
+            expiry_date = last_end_date + relativedelta(days=int(prepaid_days))
 
-            # _logger.debug(f'last_reload_date: {last_reload_date}')
-            # _logger.debug(f'last_end_date: {last_end_date}')
-            # _logger.debug(f'expiry_date: {expiry_date}')
+            _logger.debug(f'last_reload_date: {last_reload_date}')
+            _logger.debug(f'last_end_date: {last_end_date}')
+            _logger.debug(f'expiry_date: {expiry_date}')
             
-            # contact.write({
-            #     'last_reload_date': last_reload_date,
-            #     'last_end_date': last_end_date,
-            #     'expiry_date': expiry_date
-            #     })
+            contact.write({
+                'last_reload_date': last_reload_date,
+                'last_end_date': last_end_date,
+                'expiry_date': expiry_date
+                })
 
             self.record.write({
                 'date_start': date_today,
