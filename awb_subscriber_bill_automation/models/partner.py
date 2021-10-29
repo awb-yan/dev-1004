@@ -6,9 +6,9 @@ _logger = logging.getLogger(__name__)
 class Partner(models.Model):
     _inherit = "res.partner"
 
-    # last_reload_date = fields.Date(string="Last Reload Date")
-    # last_end_date = fields.Date(string="End date of the Last Reload")
-    # expiry_date = fields.Date(string="Last Expiry Date")
+    last_reload_date = fields.Date(string="Last Reload Date")
+    last_end_date = fields.Date(string="End date of the Last Reload")
+    expiry_date = fields.Date(string="Last Expiry Date")
 
     def _portal_activation(self):
         args = [
