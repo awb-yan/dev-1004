@@ -23,7 +23,9 @@
 
     'version': '13.0.1.5.8',
 
-    'depends': ['crm', 'sale_management', 'sale_subscription', 'awb_subscriber_product_information', 'awb_product_segmentation'],
+    'depends': ['crm', 'sale_management', 'sale_subscription', 'awb_subscriber_product_information', 'awb_product_segmentation'
+        # ,'contacts', 'contact_record'
+        ],
 
     'data': [
         # 'security/ir.model.access.csv',
@@ -35,8 +37,8 @@
         'views/subscription_view.xml'
         ,
         'views/res_config_settings.xml'
-        ,
-        'views/partner_view.xml'
+        # ,
+        # 'views/partner_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
